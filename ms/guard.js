@@ -49,7 +49,7 @@
       headers: { apikey: SB_KEY, "Content-Type": "application/json" },
       body: JSON.stringify({ p_slug: slug })
     }).then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (s) { if (s && s.suspended) pause(s.message); })
+      .then(function (s) { if(s&&s.retired){location.replace("https://mrspace.online/service-unavailable/");return;} if (s && s.suspended) pause(s.message); })
       .catch(function () {});
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();

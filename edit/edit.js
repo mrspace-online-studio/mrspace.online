@@ -20,7 +20,7 @@
   }
   function hub(sites){
     document.getElementById('siteName').textContent=t('shared_editor_title');
-    root.innerHTML=`<div class="edit-intro"><span class="ms-eyebrow">MR. SPACE / ${esc(t('shared_editor_title'))}</span><h1>${esc(t('shared_editor_title'))}</h1><p>${esc(t('shared_editor_intro'))}</p></div><div class="editor-sites">${sites.map(s=>`<article class="edit-card"><span class="ms-eyebrow">${esc(s.slug)}</span><h2>${esc(s.name)}</h2><p class="edit-hint">${esc(t('shared_editor_site_note'))}</p><a class="btn sun" href="?site=${encodeURIComponent(s.slug)}">${esc(t('visual_edit_open'))} ↗</a></article>`).join('')||`<section class="edit-card"><p>${esc(t(session?'no_workspaces':'shared_editor_signin'))}</p><a class="btn sun" href="../panel/">${esc(t('sign_in'))}</a></section>`}</div><section class="visual-entry editor-examples"><span class="ms-eyebrow">${esc(t('shared_editor_examples'))}</span><p>${esc(t('shared_editor_demo_note'))}</p><div class="edit-actions"><a class="btn" href="../request/?preview=mrspace">Mr. Space ↗</a><a class="btn" href="../request/?preview=rufcut">Rufcut ↗</a></div></section>`;
+    root.innerHTML=`<div class="edit-intro"><span class="ms-eyebrow">MR. SPACE / ${esc(t('shared_editor_title'))}</span><h1>${esc(t('shared_editor_title'))}</h1><p>${esc(t('shared_editor_intro'))}</p></div><div class="editor-sites">${sites.map(s=>`<article class="edit-card"><span class="ms-eyebrow">${esc(s.slug)}</span><h2>${esc(s.name)}</h2><p class="edit-hint">${esc(t('shared_editor_site_note'))}</p><a class="btn sun" href="?site=${encodeURIComponent(s.slug)}">${esc(t('visual_edit_open'))} ↗</a></article>`).join('')||`<section class="edit-card"><p>${esc(t(session?'no_workspaces':'shared_editor_signin'))}</p><a class="btn sun" href="../panel/">${esc(t('sign_in'))}</a></section>`}</div><section class="visual-entry editor-examples"><span class="ms-eyebrow">${esc(t('shared_editor_examples'))}</span><p>${esc(t('shared_editor_demo_note'))}</p><div class="edit-actions"><a class="btn" href="../request/?preview=mrspace">Mr. Space ↗</a><a class="btn" href="../request/?preview=space-tailoring">Space Tailoring ↗</a></div></section>`;
   }
   function persist(){
     let ok=true;try{localStorage.setItem(storageKey,JSON.stringify(draft));}catch{ok=false;}
@@ -71,7 +71,7 @@
       if(key)throw new Error('invalid_key');
       try{session=JSON.parse(localStorage.getItem('ms_panel')||'null');if(!session){sessionStore='ms_admin';session=JSON.parse(localStorage.getItem('ms_admin')||'null');}}catch{}
       const slug=params.get('site');
-      if(slug==='rufcut'&&session?.access_token){location.replace('../request/?self=rufcut');return;}
+
       if(!slug){
         if(!session?.access_token){hub([]);return;}
         const sites=await rpc('ms_my_sites',{});hub((Array.isArray(sites)?sites:[]).filter(s=>validKey(s.site_key)&&/^[a-z0-9_-]{1,80}$/.test(s.slug)));return;

@@ -5,7 +5,7 @@ const base=new URL('.',document.currentScript.src),lang=window.MSI18N?.lang||doc
 const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('ms-storefront.css?v=20261014-cart',base);document.head.append(css);
 let dict={};const dictReady=fetch(new URL('lang/storefront-'+(['en','tr','es','de','fr'].includes(lang)?lang:'en')+'.json?v=20261014-cart',base)).then(r=>{if(!r.ok)throw Error('dictionary');return r.json();}).then(d=>dict=d).catch(()=>{});
 const FN=(window.MS_CONFIG?.url||'https://tizfdnsjhhepxnqqrzuk.supabase.co')+'/functions/v1/ms-square';
-const commerceSite=/(^|\.)rufcutjeans\.com$/.test(location.hostname)||location.pathname.startsWith('/rufcut/')?'rufcut':'';
+const commerceSite=document.documentElement.dataset.msSite||'';
 let commerce={live:false,variations:[]};
 const commerceReady=commerceSite?fetch(FN+'/commerce?site='+commerceSite).then(r=>r.ok?r.json():null).then(d=>{if(d&&d.live)commerce=d;}).catch(()=>{}):Promise.resolve();
 const ready=Promise.all([dictReady,commerceReady]);
@@ -13,7 +13,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 function price(v){return v.price==null?tr('Ask the shop for pricing'):new Intl.NumberFormat(document.documentElement.lang||'en',{style:'currency',currency:v.currency||'USD'}).format(v.price/100);}
 const safeImage=v=>{try{const u=new URL(v);return u.protocol==='https:'?u.href:'';}catch{return '';}};
 function purchase(v,site){return window.MsSiteCatalog?.purchaseURL(v.purchase_url,site)||'';}
-function detailURL(item,v,site){if(site!=='rufcut')return '';const u=new URL((location.pathname.startsWith('/rufcut/')?'/rufcut/':'/')+'product/',location.origin);u.searchParams.set('id',item.id);u.searchParams.set('variation',v.id);u.searchParams.set('lang',lang);return u.pathname+u.search;}
+function detailURL(){return '';}
 function action(item,v,site){
  if(item.section==='repair')return `<a class="text-link" href="repair/">${esc(tr('Plan the repair'))} ↗</a>`;
  if(canBuy(item,v,site)){known.set(v.id,{item,v});return `<button type="button" class="btn primary store-add" data-cart-add="${esc(v.id)}">${esc(tr('Add to cart'))}</button><small class="store-sale-note">${esc(tr('Pay securely with Square. Choose shipping or shop pickup in the cart.'))}</small>`;}
@@ -32,7 +32,7 @@ function card(item,index,site=''){
 }
 function details(item,v,site){
  let dialog=document.getElementById('msStoreDetails');if(!dialog){dialog=document.createElement('dialog');dialog.id='msStoreDetails';dialog.className='store-dialog';document.body.append(dialog);}
- dialog.innerHTML=`<form method="dialog"><button class="store-close" aria-label="${esc(tr('Close'))}">×</button></form><h2 id="storeDetailsTitle" data-noi18n>${esc(item.name)}</h2><p data-noi18n>${esc(v.name&&v.name!=='Regular'?v.name:'')}</p><p class="store-detail-price" data-noi18n>${esc(price(v))}</p>${item.description?`<p class="store-description" data-noi18n>${esc(item.description.replace(/<[^>]*>/g,' ').slice(0,2000))}</p>`:''}<p>${esc(tr('Online checkout is not available for this piece yet.'))}</p><p>${esc(tr('Call the shop to confirm this choice, its availability and delivery options.'))}</p>${site==='rufcut'?`<a class="btn primary" href="tel:+13104735384">${esc(tr('Call the shop'))} ↗</a>`:''}`;
+ dialog.innerHTML=`<form method="dialog"><button class="store-close" aria-label="${esc(tr('Close'))}">×</button></form><h2 id="storeDetailsTitle" data-noi18n>${esc(item.name)}</h2><p data-noi18n>${esc(v.name&&v.name!=='Regular'?v.name:'')}</p><p class="store-detail-price" data-noi18n>${esc(price(v))}</p>${item.description?`<p class="store-description" data-noi18n>${esc(item.description.replace(/<[^>]*>/g,' ').slice(0,2000))}</p>`:''}<p>${esc(tr('Online checkout is not available for this piece yet.'))}</p><p>${esc(tr('Call the shop to confirm this choice, its availability and delivery options.'))}</p>`;
  dialog.setAttribute('aria-labelledby','storeDetailsTitle');dialog.showModal();dialog.onclick=e=>{if(e.target===dialog)dialog.close();};
 }
 function bind(root,items){root.querySelectorAll('[data-store-card]').forEach(card=>{

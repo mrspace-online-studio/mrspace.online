@@ -1,14 +1,17 @@
+import {retiredRoute,retiredAsset,serviceNotice,serviceGate} from './service-retirement.mjs';
 import {execFileSync} from 'node:child_process';
 import {mkdir, readFile, writeFile, lstat} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-const roots = new Set(['admin','assets','build','edit','first-clients','handover','iwona-ash','library','mrspace','packages','panel','preview','request','rufcut','space-tailoring','site','square-sku-guide','squarebaglantisi','start','studio-direction','studio','try']);
+const roots = new Set(['admin','assets','build','edit','first-clients','handover','iwona-ash','library','mrspace','packages','panel','preview','request','rufcut','service-unavailable','space-tailoring','site','square-sku-guide','squarebaglantisi','start','studio-direction','studio','try']);
 const rootFiles = new Set(['index.html','404.html','CNAME','robots.txt','sitemap.xml','og.png']);
 const extensions = new Set(['.html','.css','.js','.json','.webmanifest','.png','.jpg','.jpeg','.webp','.avif','.gif','.svg','.ico','.woff','.woff2','.ttf','.otf','.mp4','.webm','.mp3','.wav','.pdf']);
 export function isPublicFile(file) {
   const parts = file.split('/');
   if (parts.some(p => p.startsWith('.') || p === '..' || ['node_modules','review','reviews','test-results','playwright-report'].includes(p))) return false;
+  if (retiredRoute(file)) return file.endsWith('.html');
+  if (retiredAsset(file)) return false;
   if (rootFiles.has(file) || file === 'ms/guard.js') return true;
   if (file.startsWith('assets/fonts/') && file.endsWith('-OFL.txt')) return true;
   if (file.startsWith('tools/denim/')) return extensions.has(path.extname(file));
@@ -16,6 +19,8 @@ export function isPublicFile(file) {
 }
 const privateRoots = new Set(['admin','panel','edit','request','preview','build','handover','studio','try']);
 export function secureHTML(html, file) {
+  if(retiredRoute(file))html=serviceNotice();
+  html=serviceGate(html);
   // Set policy before any fetch-capable element. Client access tokens must never
   // be sent to linked sites or third-party assets through the Referer header.
   html = html.replace(/<meta\b(?=[^>]*\bname\s*=\s*["']referrer["'])[^>]*>/gi, '');

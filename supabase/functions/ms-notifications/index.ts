@@ -1,3 +1,4 @@
+import { retiredResponse } from '../_shared/service-retirement.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2.45.4';
 import { staffUser, notificationConfig } from '../_shared/notifications.ts';
 import { pushEndpoint, bytes } from '../_shared/web-push.ts';
@@ -13,6 +14,7 @@ Deno.serve(async(req:Request)=>{
   const raw=await req.text();if(raw.length>10000)return reply({error:'request_too_large'},413);const body=JSON.parse(raw);
   if(body.action==='capabilities'){const config=await notificationConfig(db);return reply({emailReady:!!(config.emailKey&&config.emailFrom),pushReady:!!config.vapid});}
   const site=String(body.site||'');if(!/^[a-z0-9_-]{1,80}$/.test(site))return reply({error:'invalid_site'},400);
+  const stopped=await retiredResponse(db,site,req);if(stopped)return stopped;
   const email=await staffUser(db,req,site);if(!email)return reply({error:'not_allowed'},403);
   if(body.action==='settings'){
    const config=await notificationConfig(db,true),prefs=await db.from('ms_notification_preferences').select('delivery_email,email_enabled,lang').eq('site',site).eq('owner_email',email).maybeSingle();if(prefs.error)throw new Error('settings_unavailable');

@@ -1,3 +1,4 @@
+import { retiredResponse } from '../_shared/service-retirement.ts';
 // Daily work, exact totals and reversible website archival. No customer data is public.
 import { createClient } from 'npm:@supabase/supabase-js@2.45.4';
 import { staffUser } from '../_shared/notifications.ts';
@@ -25,6 +26,7 @@ Deno.serve(async(req:Request)=>{
  try{
   const raw=await req.text();if(raw.length>4000)return reply({error:'invalid_request'},400);
   const body=JSON.parse(raw),site=String(body.site||'');if(!/^[a-z0-9-]{1,60}$/.test(site))return reply({error:'invalid_request'},400);
+  const stopped=await retiredResponse(db,site,req);if(stopped)return stopped;
   const email=await staffUser(db,req,site);if(!email)return reply({error:'unauthorized'},401);
   if(body.action==='billing'){
    const result=checked(await db.from('ms_billing').select('currency,terms,setup_verified_at,early_start_chosen').eq('site',site).maybeSingle());

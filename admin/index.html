@@ -321,10 +321,10 @@ async function logSiteControl(site, action){
 let D = { sites:[], checks:[], changes:[], activity:[], usage:[], payments:[], quota:{}, subs:[], vers:[], worker:null };
 async function load(){
   if (DEMO) return;
-  if (VIEWER) { const v = await rpc("ms_viewer_snapshot", {}); D = { ...v, payments:[], viewers:[], subs:[], vers:[] }; return; }
+  if (VIEWER) { const v = await rpc("ms_viewer_snapshot", {}); const active=new Set((v.sites||[]).filter(s=>s.status!=='retired').map(s=>s.slug));for(const key of ['sites','checks','changes','activity','usage'])v[key]=(v[key]||[]).filter(row=>key==='sites'?active.has(row.slug):active.has(row.site));D = { ...v, payments:[], viewers:[], subs:[], vers:[] }; return; }
   const since = new Date(Date.now() - 24 * 3600e3).toISOString();
   const [sites, checks, changes, activity, usage, payments, viewers, subs, vers, worker] = await Promise.all([
-    api("ms_sites?select=*&order=created_at"),
+    api("ms_sites?select=*&status=neq.retired&order=created_at"),
     api(`ms_checks?select=site,at,ok,ms,status&at=gte.${since}&order=at.asc&limit=3000`),
     api("ms_changes?select=*&order=created_at.desc&limit=300"),
     api("ms_activity?select=*&order=at.desc&limit=300"),
@@ -337,7 +337,8 @@ async function load(){
   ]);
   const quota = {};
   await Promise.all(sites.map(async s => { const q = await rpc("ms_quota", { p_site:s.slug }); quota[s.slug] = q[0] || {}; }));
-  D = { sites, checks, changes, activity, usage, payments, viewers, quota, subs, vers, worker };
+  const active=new Set(sites.map(s=>s.slug)),visible=rows=>rows.filter(r=>!r.site||active.has(r.site));
+  D = { sites, checks:visible(checks), changes:visible(changes), activity:visible(activity), usage:visible(usage), payments:visible(payments), viewers, quota, subs:visible(subs), vers, worker };
 }
 function demoData(){
   const now = Date.now(), iso = m => new Date(now - m * 60000).toISOString();
@@ -345,17 +346,17 @@ function demoData(){
     { slug:"mrspace", name:"Mr. Space", url:"https://mrspace.online/", admin_url:"https://mrspace.online/admin/", kind:"own", plan:"own", status:"live", monthly_cents:0 },
     { slug:"heron", name:"Heron CA", url:"https://heronca.com/", admin_url:"https://heronca.com/admin.html", kind:"own", plan:"own", status:"live", monthly_cents:0 },
     { slug:"laloo", name:"laloo", url:"https://www.laloo.org/", admin_url:"https://www.laloo.org/admin.html", kind:"own", plan:"own", status:"live", monthly_cents:0 },
-    { slug:"rufcut", name:"Rufcut", url:"https://mrspace.online/rufcut/", admin_url:null, kind:"client", plan:"first", status:"building", small_quota:8, big_quota:4, monthly_cents:5000, paid_until:addDays(today(), 21), grace_days:7, contact:"hello@rufcut.com", site_key:"00000000-0000-0000-0000-000000000000" }
+    { slug:"sampleworkshop", name:"Your Brand", url:"https://mrspace.online/sampleworkshop/", admin_url:null, kind:"client", plan:"first", status:"building", small_quota:8, big_quota:4, monthly_cents:5000, paid_until:addDays(today(), 21), grace_days:7, contact:"shop@example.test", site_key:"00000000-0000-0000-0000-000000000000" }
   ];
   const checks = [];
   sites.forEach(s => { for (let i = 95; i >= 0; i--) checks.push({ site:s.slug, at:iso(i * 15), ok:!(s.slug === "laloo" && (i === 40 || i === 41)), ms:180 + Math.round(Math.random() * 220) }); });
   const changes = [
-    { id:3, site:"rufcut", kind:"small", target:"hours", request:"Saturday hours 10:00 to 7:00", requested_by:"Rufcut", status:"new", created_at:iso(35) },
-    { id:2, site:"rufcut", kind:"big", target:"homepage", request:"Bigger photo of the workbench on the homepage", requested_by:"Rufcut", status:"new", created_at:iso(220) },
+    { id:3, site:"sampleworkshop", kind:"small", target:"hours", request:"Saturday hours 10:00 to 7:00", requested_by:"Your Brand", status:"new", created_at:iso(35) },
+    { id:2, site:"sampleworkshop", kind:"big", target:"homepage", request:"Bigger photo of the workbench on the homepage", requested_by:"Your Brand", status:"new", created_at:iso(220) },
     { id:1, site:"heron", kind:"small", target:"banner", request:"Free shipping banner: change $80 to $75", requested_by:"Uzay", status:"done", counts:true, minutes:6, created_at:iso(2000), decided_at:iso(1990), done_at:iso(1980) }
   ];
   const activity = [
-    { site:"rufcut", who:"client", action:"New change request: Saturday hours 10:00 to 7:00", minutes:0, at:iso(35) },
+    { site:"sampleworkshop", who:"client", action:"New change request: Saturday hours 10:00 to 7:00", minutes:0, at:iso(35) },
     { site:"laloo", who:"auto", action:"Site is back up", minutes:0, at:iso(590) },
     { site:"laloo", who:"auto", action:"Site did not answer", minutes:0, at:iso(615) },
     { site:"heron", who:"uzay", action:"Price labels template", minutes:12, at:iso(800) },
@@ -368,19 +369,19 @@ function demoData(){
     { site:"heron", service:"AI writing", used:3.4, lim:10, unit:"USD / month", enabled:true },
     { site:"laloo", service:"Map tiles", used:21000, lim:50000, unit:"loads / month", enabled:true }
   ];
-  const payments = [{ site:"rufcut", amount_cents:30000, paid_at:addDays(today(), -9), period_to:addDays(today(), 21), note:"Setup (first client)" }];
-  const quota = { rufcut:{ small_used:3, small_quota:8, big_used:1, big_quota:4 } };
-  const subs = [{ id:7, site:"rufcut", edit_key:"demo", name:"Rufcut", email:"hello@rufcut.com", version:2, approved:["a","b","c","d","e","f","g","h","i"], created_at:iso(300), updated_at:iso(40) }];
+  const payments = [{ site:"sampleworkshop", amount_cents:30000, paid_at:addDays(today(), -9), period_to:addDays(today(), 21), note:"Setup (first client)" }];
+  const quota = { sampleworkshop:{ small_used:3, small_quota:8, big_used:1, big_quota:4 } };
+  const subs = [{ id:7, site:"sampleworkshop", edit_key:"demo", name:"Your Brand", email:"shop@example.test", version:2, approved:["a","b","c","d","e","f","g","h","i"], created_at:iso(300), updated_at:iso(40) }];
   const v1 = [
     { id:11, kind:"small", target:"Heading: Custom jeans, cut in Venice", original:"Custom jeans, cut in Venice", request:"Custom jeans cut by hand in Venice", status:"new" },
     { id:12, kind:"small", target:"Text: Open daily 11 to 7", original:"Open daily 11 to 7", request:"Open daily 10 to 7", status:"new" },
-    { id:13, kind:"small", target:"Image: hero", original:"/rufcut/hero.jpg", request:"Use the workbench photo", status:"new" }];
+    { id:13, kind:"small", target:"Image: hero", original:"/sampleworkshop/hero.jpg", request:"Use the workbench photo", status:"new" }];
   const v2 = [
     { ...v1[0], request:"Custom jeans, cut by hand on the Venice boardwalk" }, v1[1],
     { id:14, kind:"small", target:"Button: Book a fitting", original:"Book a fitting", request:"Book a fitting today", status:"new" }];
   const vers = [{ submission_id:7, version:1, at:iso(300), items:v1 }, { submission_id:7, version:2, at:iso(40), items:v2 }];
-  v2.forEach(x => changes.unshift({ ...x, site:"rufcut", requested_by:"Rufcut", submission_id:7, created_at:iso(300) }));
-  changes.push({ ...v1[2], site:"rufcut", requested_by:"Rufcut", submission_id:7, status:"withdrawn", created_at:iso(300) });
+  v2.forEach(x => changes.unshift({ ...x, site:"sampleworkshop", requested_by:"Your Brand", submission_id:7, created_at:iso(300) }));
+  changes.push({ ...v1[2], site:"sampleworkshop", requested_by:"Your Brand", submission_id:7, status:"withdrawn", created_at:iso(300) });
   D = { sites, checks, changes, activity, usage, payments, quota, subs, vers, worker:{ enabled:false, budget_month:10, budget_per_request:1, spend_month:0, routes:{ classify:["gemini","deepseek","haiku"], content:["gemini","deepseek","haiku"], code:["deepseek","haiku","gemini"] }, keys:[] } };
 }
 
@@ -601,7 +602,7 @@ function worker(){
   const opts = selected => ["gemini","deepseek","haiku"].map(p => `<option value="${p}" ${p === selected ? "selected" : ""}>${providerName[p]}</option>`).join("");
   const routeRows = routeKeys.map(route => `<div class="worker-route"><label>${routeLabel[route]}</label>${[0,1,2].map(i => `<select data-route="${route}" data-pos="${i}" aria-label="${routeLabel[route]} ${i+1}. model">${opts((routes[route] || [])[i])}</select>`).join("")}</div>`).join("");
   const keyRows = keys.map(k => `<div class="worker-key"><div><b>${providerName[k.provider]}</b><small>${k.configured ? `${T("Anahtar kayıtlı")} · ${T("sonu")} ${esc(k.last4 || "••••")}` : T("Anahtar eklenmedi")}</small></div><label>Yeni API anahtarı<input type="password" autocomplete="new-password" data-key="${k.provider}" placeholder="Yalnızca yeni anahtar yaz"></label><button class="btn sm" data-act="worker-key" data-provider="${k.provider}">Kaydet</button></div>`).join("");
-  const siteRows = D.sites.map(s => `<div class="worker-key"><div><b>${esc(s.name)}</b><small>${esc(s.slug)}</small></div><label>GitHub repo<input type="text" data-repo="${esc(s.slug)}" value="${esc(s.repo || "Zuzay/mrspace.online")}" placeholder="owner/repo"></label><label>Repo klasörü<input type="text" data-path="${esc(s.slug)}" value="${esc(s.repo_path || "")}" placeholder="rufcut/"></label><button class="btn sm" data-act="worker-site" data-site="${esc(s.slug)}">Kaydet</button></div>`).join("");
+  const siteRows = D.sites.map(s => `<div class="worker-key"><div><b>${esc(s.name)}</b><small>${esc(s.slug)}</small></div><label>GitHub repo<input type="text" data-repo="${esc(s.slug)}" value="${esc(s.repo || "Zuzay/mrspace.online")}" placeholder="owner/repo"></label><label>Repo klasörü<input type="text" data-path="${esc(s.slug)}" value="${esc(s.repo_path || "")}" placeholder="sampleworkshop/"></label><button class="btn sm" data-act="worker-site" data-site="${esc(s.slug)}">Kaydet</button></div>`).join("");
   const spent = Number(w.spend_month || 0), limit = Number(w.budget_month || 0), pct = limit > 0 ? Math.min(100, Math.round(spent / limit * 100)) : 0;
   return `<div class="head"><div><h1>İşçi</h1><p>API anahtarlarını, bütçeyi, model sırasını ve sitelerin repo klasörünü yönet.</p></div><button class="btn sun" data-act="worker-run">Şimdi çalıştır</button></div>
    <div class="kpis"><div class="kpi"><small>Durum</small><b>${w.enabled ? "Açık" : "Kapalı"}</b><span>${w.updated_at ? "Güncellendi " + ago(w.updated_at) : "Kurulum bekliyor"}</span></div><div class="kpi"><small>Bu ay</small><b>$${spent.toFixed(2)}</b><span>/ $${limit.toFixed(2)} aylık tavan</span></div><div class="kpi"><small>Talep başı tavan</small><b>$${Number(w.budget_per_request || 0).toFixed(2)}</b><span>API çağrılarının toplam sınırı</span></div><div class="kpi"><small>Harcanan bütçe</small><b>${pct}%</b><span class="meter"><span class="bar"><i style="width:${pct}%"></i></span></span></div></div>
@@ -609,7 +610,7 @@ function worker(){
     <section class="worker-card"><div class="panel-h"><h2>Genel ayarlar</h2><button class="btn sm sun" data-act="worker-save">Ayarları kaydet</button></div><div class="form"><label class="wide" style="display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0"><input type="checkbox" id="workerEnabled" ${w.enabled ? "checked" : ""} style="width:auto"> Otomatik işçi açık</label><label>Aylık bütçe · USD<input type="number" id="workerBudgetMonth" min="0.01" max="10000" step="0.01" value="${esc(w.budget_month ?? 10)}"></label><label>Talep başı bütçe · USD<input type="number" id="workerBudgetRequest" min="0.01" step="0.01" value="${esc(w.budget_per_request ?? "")}"></label></div><div class="control-notice" style="margin:0 16px 16px">Açma işlemi yeni ve onaylanmış talepleri otomatik çalıştırır. Önce en az bir AI anahtarı ve GitHub token ile iki bütçe sınırını gir.</div></section>
     <section class="worker-card"><div class="panel-h"><h2>API anahtarları</h2></div>${keyRows}<div class="control-notice" style="margin:0 16px 16px">GitHub token için bu repo ile sınırlı fine-grained token kullan; Contents ve Pull requests için yazma izni gerekir.</div></section>
     <section class="worker-card"><div class="panel-h"><h2>İş türüne göre model sırası</h2><span class="mono">Öncelik 1 → 2 → 3</span></div>${routeRows}<div class="acts"><button class="btn sm sun" data-act="worker-save">Ayarları kaydet</button></div></section>
-    <section class="worker-card"><div class="panel-h"><h2>GitHub site klasörleri</h2></div>${siteRows || '<div class="empty">Site bulunamadı.</div>'}<div class="control-notice" style="margin:0 16px 16px">Klasör yolunu repo köküne göre yaz, ör. <code>rufcut/</code>. Boş yol bırakırsan işçi o siteye dokunmaz.</div></section>
+    <section class="worker-card"><div class="panel-h"><h2>GitHub site klasörleri</h2></div>${siteRows || '<div class="empty">Site bulunamadı.</div>'}<div class="control-notice" style="margin:0 16px 16px">Klasör yolunu repo köküne göre yaz, ör. <code>sampleworkshop/</code>. Boş yol bırakırsan işçi o siteye dokunmaz.</div></section>
    </div>`;
 }
 function access(){

@@ -1,11 +1,11 @@
 name: Publish client sites
 # Builds every sites/<slug>/site.json that has a "repo" and pushes the result to that
 # client repo (GitHub Pages serves it). Without the SITES_DEPLOY_TOKEN secret it only
-# builds and lists what would change (dry run). Files are never deleted in the client repo.
+# builds and lists what would change (dry run). Active client files are preserved; an explicitly retired publication replaces the old site.
 on:
   push:
     branches: [main]
-    paths: ['sites/**', 'assets/**', 'tools/build-site.mjs', 'rufcut/**', 'iwona-ash/**']
+    paths: ['sites/**', 'assets/**', 'tools/build-site.mjs', 'tools/service-retirement.mjs', 'tools/prune-retired-site.mjs', 'service-unavailable/**', 'rufcut/**', 'iwona-ash/**']
   workflow_dispatch:
     inputs:
       slug:
@@ -36,6 +36,7 @@ jobs:
             node tools/build-site.mjs "$slug" "$out"
             if [ -n "$TOKEN" ]; then url="https://x-access-token:${TOKEN}@github.com/${target}.git"; else url="https://github.com/${target}.git"; fi
             git clone --quiet --depth 1 "$url" "$dest"
+            node tools/prune-retired-site.mjs "$cfg" "$dest"
             cp -R "$out"/. "$dest"/
             cd "$dest"; git add -A
             if git diff --cached --quiet; then echo "$slug: already up to date"; cd - >/dev/null; continue; fi

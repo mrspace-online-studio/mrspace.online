@@ -7,8 +7,8 @@ import path from 'node:path';
 import {isPublicFile,secureHTML,buildPublicSite} from '../tools/build-public-site.mjs';
 
 test('private source, secrets, snapshots and configuration never qualify',()=>{
-  for(const file of ['.env','.git/config','supabase/functions/ms-square/index.ts','ms/mrspace-system.sql','ms/worker/worker.mjs','AGENTS.md','README.md','package.json','tests/example.spec.js','assets/app.js.map','sites/rufcut/site.json','rufcut/site.json','studio-direction/review/screen.png','assets/.env.json','tools/build-site.mjs']) assert.equal(isPublicFile(file),false,file);
-  for(const file of ['index.html','assets/ms-config.js','assets/lang/tr.json','admin/index.html','panel/panel.webmanifest','ms/guard.js','tools/denim/denim.js','rufcut/media/store.webp','assets/fonts/Anton-OFL.txt']) assert.equal(isPublicFile(file),true,file);
+  for(const file of ['.env','.git/config','supabase/functions/ms-square/index.ts','ms/mrspace-system.sql','ms/worker/worker.mjs','AGENTS.md','README.md','package.json','tests/example.spec.js','assets/app.js.map','rufcut/media/store.webp','rufcut/.private.html','sites/rufcut/site.json','rufcut/site.json','studio-direction/review/screen.png','assets/.env.json','tools/build-site.mjs']) assert.equal(isPublicFile(file),false,file);
+  for(const file of ['index.html','assets/ms-config.js','assets/lang/tr.json','admin/index.html','panel/panel.webmanifest','ms/guard.js','tools/denim/denim.js','assets/fonts/Anton-OFL.txt']) assert.equal(isPublicFile(file),true,file);
 });
 test('referrer policy precedes assets; sensitive pages are not indexed',()=>{
   const source=`<html><head><meta name='referrer' content='unsafe-url'><link href='https://example.com/font'></head><body><a target='_blank' rel='external' href='https://example.com'>Go</a></body></html>`;

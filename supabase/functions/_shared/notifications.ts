@@ -26,29 +26,3 @@ export async function mail(config: any,to: string,subject: string,text: string) 
  const result=await fetch('https://api.resend.com/emails',{method:'POST',headers:{Authorization:'Bearer '+config.emailKey,'Content-Type':'application/json'},body:JSON.stringify({from:config.emailFrom,reply_to:config.contactEmail||'mrspace.online1@gmail.com',to:[to],subject,text}),signal:AbortSignal.timeout(8000)});
  return result.ok;
 }
-const words:Record<string,string[]>={en:['New repair work order','New jeans design','Open the work order in your panel.'],tr:['Yeni tamir iş emri','Yeni jeans tasarımı','İş emrini panelinde aç.'],es:['Nueva orden de reparación','Nuevo diseño de jeans','Abre la orden en tu panel.'],de:['Neuer Reparaturauftrag','Neuer Jeansentwurf','Öffne den Auftrag in deinem Panel.'],fr:['Nouvelle retouche','Nouveau modèle de jeans','Ouvrez la fiche dans votre panneau.']};
-export async function notifyOrder(db: any,order: any,ticket: string) {
- const config=await notificationConfig(db),site=order.site,kind=order.kind;
- const url='https://mrspace.online/panel/?site='+encodeURIComponent(site)+'&view=orders&ticket='+encodeURIComponent(ticket);
- const summary=kind==='jeans'?Object.entries(order.design).map(([k,v])=>k+': '+String(v)).join('\n'):
- order.items.map((it:any,i:number)=>`${i+1}. ${it.garment} (${it.gender}): ${it.actions.join(', ')}${it.inches?' / '+it.inches+' in':''}${it.note?'\n'+it.note:''}`).join('\n\n');
- const preferences=await db.from('ms_notification_preferences').select('owner_email,delivery_email,email_enabled,lang').eq('site',site);if(preferences.error)throw new Error('preferences_unavailable');
- const members=[];for(const pref of preferences.data||[])if(await memberEmail(db,pref.owner_email,site))members.push(pref);
- const recipients=new Set<string>();if(!members.some(p=>p.delivery_email===config.contactEmail&&!p.email_enabled))recipients.add(config.contactEmail);
- members.filter(p=>p.email_enabled).forEach(p=>recipients.add(p.delivery_email));
- const text=`Ticket: ${ticket}\nCustomer: ${order.customer_name}\nEmail: ${order.customer_email}\nPhone: ${order.customer_phone||''}\n\n${summary}\n\n${url}`;
- const emailResults=await Promise.allSettled([mail(config,order.customer_email,`Rufcut ${kind==='jeans'?'jeans':'repair'} ticket ${ticket}`,`Hi ${order.customer_name},\n\nYour request reached Rufcut.\nTicket: ${ticket}\n\n${summary}\n\nTrack it at https://mrspace.online/rufcut/?ticket=${encodeURIComponent(ticket)}#order`),...Array.from(recipients,to=>mail(config,to,`Rufcut / ${kind==='jeans'?'New jeans design':'New repair order'} / ${ticket}`,text))]);
- const emailSent=emailResults.every(r=>r.status==='fulfilled'&&r.value===true);
- if(emailSent)await db.from('ms_repair_jobs').update({email_sent:true}).eq('site',site).eq('ticket',ticket);
- if(config.vapid){
-  const subs=await db.from('ms_push_subscriptions').select('endpoint,p256dh,auth,owner_email,lang').eq('site',site).eq('enabled',true).limit(100);
-  if(subs.error)throw new Error('subscriptions_unavailable');
-  await Promise.allSettled((subs.data||[]).map(async(sub:any)=>{
-   if(!await memberEmail(db,sub.owner_email,site)){await db.from('ms_push_subscriptions').update({enabled:false}).eq('site',site).eq('endpoint',sub.endpoint);return;}
-   const copy=words[sub.lang]||words.en;
-   const result=await sendPush(sub,{title:'Rufcut / '+copy[kind==='jeans'?1:0],body:ticket+' · '+copy[2],url,tag:ticket},config.vapid);
-   if(result.expired)await db.from('ms_push_subscriptions').update({enabled:false}).eq('site',site).eq('endpoint',sub.endpoint);
-  }));
- }
- return {emailSent};
-}

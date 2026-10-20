@@ -1,3 +1,4 @@
+import { retiredResponse,closedServiceResponse } from '../_shared/service-retirement.ts';
 // ms-square · Mr. Space Square baglantisi
 // Musteri kendi Square hesabini panelden baglar. Stok, katalog, urun ekleme, etiket verisi buradan.
 //   GET  /ms-square/callback   Square'in geri dondugu adres (Square uygulamasinda Redirect URL olarak yazilir)
@@ -212,8 +213,8 @@ async function commerceState(site: string) {
   let scopes=null;try{scopes=(await sq(acc.access_token,"/oauth2/token/status",{method:"POST"})).scopes||[];}catch{/* unknown = not granted */}
   return {acc,setup,items,readiness:Commerce.readiness(setup,acc,scopes,items)};
 }
-const CHECKOUT_ORIGINS=new Set((Deno.env.get("CHECKOUT_ORIGINS")??"https://www.rufcutjeans.com,https://rufcutjeans.com,https://mrspace.online").split(",").map(s=>s.trim()).filter(Boolean));
-const SHOP_NAME: Record<string,string>={rufcut:"Rufcut"};
+const CHECKOUT_ORIGINS=new Set((Deno.env.get("CHECKOUT_ORIGINS")??"https://mrspace.online").split(",").map(s=>s.trim()).filter(Boolean));
+const SHOP_NAME: Record<string,string>={};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
@@ -226,7 +227,7 @@ Deno.serve(async (req) => {
       const [payload, sig] = state.split(".");
       if (!payload || !sig || sig !== await sign(payload)) return back("?square=bad_state");
       const st = JSON.parse(unb64(payload));
-      if (st.site === "rufcut") return back("?square=disabled&site=rufcut");
+      const stopped=await retiredResponse(db,st.site,req);if(stopped)return new Response(null,{status:302,headers:{Location:"https://mrspace.online/service-unavailable/","Cache-Control":"no-store"}});
       if (st.exp < Date.now()) return back("?square=expired");
       if (!code) return back(`?square=${encodeURIComponent(url.searchParams.get("error") || "cancelled")}&site=${st.site}`);
       const t = await oauthToken({ grant_type: "authorization_code", code, redirect_uri: CALLBACK });
@@ -245,6 +246,7 @@ Deno.serve(async (req) => {
     // ----- sitenin kendisi icin stok -----
     if (url.pathname.endsWith("/public")) {
       const site = url.searchParams.get("site") || "";
+      const stopped=await retiredResponse(db,site,req);if(stopped)return stopped;
       if (site === "rufcut") return json({ items: [], disabled: true }, 200, { "Cache-Control": "no-store" });
       const acc = await account(site);
       if (!acc || !acc.public_catalog) return json({ items: [] }, 200, { "Cache-Control": "public, max-age=60" });
@@ -256,6 +258,7 @@ Deno.serve(async (req) => {
     // ----- sitenin sepeti: hangi parcalar online satilabilir -----
     if (url.pathname.endsWith("/commerce") && req.method === "GET") {
       const site = url.searchParams.get("site") || "";
+      const stopped=await retiredResponse(db,site,req);if(stopped)return stopped;
       if (site === "rufcut") return json({ error: "sales_disabled", live: false }, 409, { "Cache-Control": "no-store" });
       const st = await commerceState(site);
       if (!st || !st.readiness.checkout_live) return json({ live: false }, 200, { "Cache-Control": "public, max-age=60" });
@@ -266,6 +269,7 @@ Deno.serve(async (req) => {
     if (url.pathname.endsWith("/checkout") && req.method === "POST") {
       const body = await req.json().catch(() => ({}));
       const site = String(body.site || "");
+      const stopped=await retiredResponse(db,site,req);if(stopped)return stopped;
       if (site === "rufcut") return json({ error: "sales_disabled", live: false }, 409, { "Cache-Control": "no-store" });
       const st = await commerceState(site);
       if (!st || !st.readiness.checkout_live) return json({ error: "checkout_closed" }, 409);
@@ -273,7 +277,7 @@ Deno.serve(async (req) => {
       try { quote = Commerce.quote(st.setup, st.items, { lines: body.lines, delivery: body.delivery, country: body.country }, st.acc.currency); }
       catch (e) { return json({ error: (e as Error).message || "commerce_invalid" }, 400); }
       const origin = req.headers.get("origin") || "";
-      const back = (CHECKOUT_ORIGINS.has(origin) ? origin : "https://www.rufcutjeans.com") + (origin === "https://mrspace.online" ? "/rufcut/thanks/" : "/thanks/");
+      const back = (CHECKOUT_ORIGINS.has(origin) ? origin : "https://mrspace.online") + "/thanks/";
       const pickup = body.delivery === "pickup";
       const d = await sq(st.acc.access_token, "/v2/online-checkout/payment-links", { method: "POST", body: JSON.stringify({
         idempotency_key: crypto.randomUUID(),
@@ -303,6 +307,7 @@ Deno.serve(async (req) => {
     if (req.method !== "POST") return json({ error: "method" }, 405);
     const body = await req.json().catch(() => ({}));
     const site = String(body.site || "");
+      const stopped=await retiredResponse(db,site,req);if(stopped)return stopped;
     const email = await who(req);
     const r = await role(email, site);
     if (!r) return json({ error: "not_allowed" }, 403);

@@ -2,6 +2,7 @@
 // Usage: node tools/build-site.mjs <slug> <empty-output-dir>
 // Same contract for every client: copy the site folder, add the shared Mr. Space
 // assets it lists, apply text rewrites, then write CNAME, robots, sitemap, _redirects.
+import {retiredServices,serviceNotice} from './service-retirement.mjs';
 import fs from 'node:fs/promises'; import path from 'node:path'; import { fileURLToPath } from 'node:url';
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const [slug, outArg] = process.argv.slice(2);
@@ -13,6 +14,16 @@ if (output === repo || output.startsWith(repo + path.sep) || repo.startsWith(out
 await fs.mkdir(output, { recursive: true });
 if ((await fs.readdir(output)).length) throw Error('Output must be empty; choose a new release directory.');
 
+if (retiredServices.some(s=>s.site===slug)) {
+  for(const file of ['index.html','404.html',...(cfg.retired_pages||[])]){
+    if(file.includes('..')||path.isAbsolute(file)||!file.endsWith('.html'))throw Error('Invalid retired path');
+    await fs.mkdir(path.dirname(path.join(output,file)),{recursive:true});await fs.writeFile(path.join(output,file),serviceNotice());
+  }
+  if(cfg.domain)await fs.writeFile(path.join(output,'CNAME'),cfg.domain+'\n');
+  await fs.writeFile(path.join(output,'robots.txt'),'User-agent: *\nDisallow: /\n');
+  await fs.writeFile(path.join(output,'.nojekyll'),'');
+  console.log('Built retired service notice -> '+output);process.exit(0);
+}
 const src = path.join(repo, cfg.source);
 const skip = cfg.skip_prefixes || [];
 await fs.cp(src, output, { recursive: true, filter: p => !skip.some(s => path.basename(p).startsWith(s)) });

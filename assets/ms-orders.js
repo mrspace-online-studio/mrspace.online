@@ -22,7 +22,7 @@
  }
  function print(job){
   const target=document.getElementById('print'),style=document.getElementById('pageSize'),previousHTML=target.innerHTML,previousCSS=style.textContent;
-  target.innerHTML=`<article class="printed-order"><header><strong>${esc('RUFCUT')}</strong><span>${esc(t('order_ticket'))}</span></header><h1>${esc(job.ticket)}</h1><p>${esc(label(job.kind||'repair'))} · ${esc(label(job.status))} · ${esc(date(job.created_at))}</p><h2>${esc(job.customer_name)}</h2><p>${esc(job.customer_email)}${job.customer_phone?' · '+esc(job.customer_phone):''}</p>${drawings(job)}${details(job)}${job.measurements?`<h3>${esc(t('order_fitting'))}</h3><p class="order-note">${esc(job.measurements)}</p>`:''}${job.staff_notes?`<h3>${esc(t('order_staff_note'))}</h3><p class="order-note">${esc(job.staff_notes)}</p>`:''}<footer>${esc(t('order_ticket_note'))}</footer></article>`;
+  target.innerHTML=`<article class="printed-order"><header><strong>${esc('MR. SPACE')}</strong><span>${esc(t('order_ticket'))}</span></header><h1>${esc(job.ticket)}</h1><p>${esc(label(job.kind||'repair'))} · ${esc(label(job.status))} · ${esc(date(job.created_at))}</p><h2>${esc(job.customer_name)}</h2><p>${esc(job.customer_email)}${job.customer_phone?' · '+esc(job.customer_phone):''}</p>${drawings(job)}${details(job)}${job.measurements?`<h3>${esc(t('order_fitting'))}</h3><p class="order-note">${esc(job.measurements)}</p>`:''}${job.staff_notes?`<h3>${esc(t('order_staff_note'))}</h3><p class="order-note">${esc(job.staff_notes)}</p>`:''}<footer>${esc(t('order_ticket_note'))}</footer></article>`;
   style.textContent='@page{size:A4 portrait;margin:14mm}';
   window.addEventListener('afterprint',()=>{target.innerHTML=previousHTML;style.textContent=previousCSS;},{once:true});window.print();
  }
