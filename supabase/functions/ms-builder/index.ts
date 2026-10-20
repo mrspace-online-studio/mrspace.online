@@ -1,4 +1,3 @@
-import { retiredResponse } from '../_shared/service-retirement.ts';
 // ms-builder · Mr. Space kurucu fonksiyonu
 // 1) action=check : gonderilen sitenin arka plan kontrolleri (zamanlayici sifresiyle)
 // 2) action=upload: musteri / yonetici gorsel yukleme (sitenin gizli linkiyle)
@@ -282,7 +281,6 @@ async function upload(req: Request) {
     const lookup = db.from("ms_sites").select("slug");
     const { data: s } = await (slug ? lookup.eq("slug", slug) : lookup.eq("site_key", key)).maybeSingle();
     if (!s) return json({ error: "unknown_site" }, 403);
-    const stopped=await retiredResponse(db,s.slug,req);if(stopped)return stopped;
     if (file.size > (isVideo ? 25 : 5) * 1024 * 1024) return json({ error: "size" }, 400);
     const since = new Date(Date.now() - 3600e3).toISOString();
     const { count } = await db.from("ms_activity").select("id", { count: "exact", head: true })
