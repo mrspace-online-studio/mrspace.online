@@ -1,3 +1,4 @@
+import { retiredResponse } from '../_shared/service-retirement.ts';
 // Secure server-side bridge from the Mr. Space admin panel to Heron's existing admin API.
 // Set HERON_ADMIN_PASSWORD as a Supabase Function secret. Never expose it to the browser.
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
@@ -117,6 +118,7 @@ Deno.serve(async (req) => {
     const { data: admin } = await db.from("ms_admins").select("email").eq("email", user.email.toLowerCase()).maybeSingle();
     if (!admin) return json({ error: "forbidden" }, 403);
     const body = await req.json().catch(() => ({}));
+    const stopped=await retiredResponse(db,String(body.site||""),req);if(stopped)return stopped;
     const action = String(body.action || "");
     if (action === "prepare_drafts") return await prepareDrafts();
     if (action === "check_connections") return await checkConnections(jwt, String(body.site || ""), user.email);

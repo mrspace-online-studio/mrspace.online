@@ -227,86 +227,6 @@ var HERON = {
   }
 };
 
-/* ---------- RUFCUT ---------- */
-var FITS = {
-  Slim:    "M14 22 H106 L100 196 H70 L60 76 L50 196 H20 Z",
-  Straight:"M14 22 H106 L106 196 H68 L60 76 L52 196 H14 Z",
-  Relaxed: "M12 22 H108 L114 196 H70 L60 76 L50 196 H6 Z"
-};
-var WASH = { Raw:"#1B2A4E", Rinse:"#2D4677", Stone:"#6C86B5" };
-var THREAD = { Copper:"#E08A3C", Gold:"#D9B44A", Tonal:"#4A5E8C" };
-function bit(cls, txt, m, t){ /* m,t: [x,y,w,h,rot] messy and tidy */
-  return '<div class="bit '+cls+'" data-t="'+t.join(",")+'" style="left:'+m[0]+'px;top:'+m[1]+'px;'+(m[2]?'width:'+m[2]+'px;':'')+(m[3]?'height:'+m[3]+'px;':'')+'transform:rotate('+m[4]+'deg)">'+txt+'</div>';
-}
-var RUFCUT = {
-  label: "Demo: Rufcut's cluttered site cleaned up, then the jeans builder and the workshop order board",
-  chapters: ["The old site","Cleaned up","Jeans builder","Order in the workshop","Customer gets a text"],
-  html:
-   '<div class="scene rc-old on" data-s="old" id="old"><span class="rc-before" id="bf">BEFORE</span>' +
-     bit("rc-nav","<span>HOME</span>|<span>Jeans</span>|<span>ABOUT US</span>|<span>press</span>|<span>Contact!!</span>|<span>Reviews</span>",[300,14,330,0,2],[30,22,520,0,0]) +
-     bit("rc-banner","WELCOME 2 YOUR SHOP!!! CUSTOM DENIM!!!",[24,48,400,0,-3],[30,70,350,0,0]) +
-     bit("rc-pic","",[520,70,170,120,6],[420,60,300,300,0]) +
-     bit("rc-txt","We make custom jeans in Venice!! Call us or come by the shop. We also have vintage levis and do repairs. Click here for more info about our workshop and press!!!",[190,150,230,0,2],[30,200,330,0,0]) +
-     bit("rc-pic","",[50,250,120,90,-7],[30,330,105,90,0]) +
-     bit("rc-pic","",[300,320,150,100,4],[145,330,105,90,0]) +
-     bit("rc-btn","CLICK HERE",[590,290,0,0,-10],[30,272,0,0,0]) +
-     bit("rc-stamp","AS SEEN IN PRESS!!",[40,170,0,0,-8],[40,170,0,0,0]) +
-     bit("rc-txt","Hours: mon-fri 11-6 sat sun 10-7 (sometimes)",[480,380,200,0,-2],[260,330,150,0,0]) +
-   '</div>' +
-   '<div class="scene" data-s="build"><div class="rc-b">' +
-     '<div class="opts">' +
-       '<div style="font:400 26px/1 var(--display)">BUILD YOUR PAIR</div>' +
-       '<div class="grp"><span>01 FIT</span><div class="chips" data-g="fit"><b>Slim</b><b class="on">Relaxed</b><b>Straight</b></div></div>' +
-       '<div class="grp"><span>02 DENIM</span><div class="chips"><b class="on">Raw selvedge</b><b>Stretch</b></div></div>' +
-       '<div class="grp"><span>03 WASH</span><div class="chips" data-g="wash"><b class="on">Raw</b><b>Rinse</b><b>Stone</b></div></div>' +
-       '<div class="grp"><span>04 THREAD</span><div class="chips" data-g="thread"><b class="on">Tonal</b><b>Gold</b><b>Copper</b></div></div>' +
-       '<div class="grp"><span>05 HEM</span><div class="chips" data-g="hem"><b class="on">Cuffed</b><b>Chain stitch</b></div></div>' +
-       '<div class="grp" style="margin-top:4px"><b id="ord" style="display:inline-block;background:#E08A3C;color:#16223F;font:500 11px var(--mono);letter-spacing:.06em;padding:10px 14px;width:max-content">ORDER · $45 DEPOSIT</b></div>' +
-     '</div>' +
-     '<div class="pants"><svg viewBox="0 0 120 200" aria-hidden="true"><rect x="12" y="6" width="96" height="16" fill="#0F1A33"/><path id="leg" d="'+FITS.Relaxed+'" fill="'+WASH.Raw+'" style="transition:fill .5s"/><path id="st" d="M18 28 H102 M60 28 V74 M24 40 Q40 52 52 40" stroke="'+THREAD.Tonal+'" stroke-width="1.6" stroke-dasharray="3 2.4" fill="none" style="transition:stroke .5s"/><circle cx="60" cy="14" r="3.5" fill="#B87333"/></svg>' +
-       '<div class="ready"><span>READY</span><strong id="rd">THURSDAY, OCT 8</strong></div></div>' +
-   '</div></div>' +
-   '<div class="scene" data-s="board"><div class="rc-k">' +
-     '<div class="h"><span class="yb"><i></i>YOUR BRAND</span><b>WORKSHOP · ORDERS</b><span>Today · 6 open</span></div>' +
-     '<div class="cols" id="cols">' +
-       '<div class="col"><span>Cut <em>2</em></span><div class="card old">#1039 · Slim · Rinse</div></div>' +
-       '<div class="col"><span>Sew <em>2</em></span><div class="card old">#1036 · Jacket · Raw</div><div class="card old">#1037 · Straight · Stone</div></div>' +
-       '<div class="col"><span>Finish <em>1</em></span><div class="card old">#1034 · Relaxed · Raw</div></div>' +
-       '<div class="col"><span>Ready <em>1</em></span><div class="card old">#1031 · Repair · Knee patch</div></div>' +
-       '<div class="card mv" id="mv" style="opacity:0"><b>#1042 · Maya R.</b><br>Straight · Rinse · <em>Copper</em><br>Chain stitch hem</div>' +
-     '</div>' +
-   '</div></div>',
-  run: async function(a){
-    a.chapter(0); a.scene("old"); a.url("yourbrand.com");
-    await a.wait(900); await a.go(".rc-btn"); await a.wait(700); await a.go(".rc-nav"); await a.wait(800); await a.go(".rc-stamp"); await a.wait(900);
-    a.chapter(1);
-    var old = a.$("#old"); old.classList.add("tidy"); a.$("#bf").textContent = "AFTER · SAME CONTENT, ORGANIZED";
-    a.$$(".bit").forEach(function(b){ var t = b.getAttribute("data-t").split(","); b.style.left = t[0]+"px"; b.style.top = t[1]+"px"; if (+t[2]) b.style.width = t[2]+"px"; if (+t[3]) b.style.height = t[3]+"px"; b.style.transform = "rotate(0deg)"; });
-    await a.wait(600);
-    a.$(".rc-banner").textContent = "YOUR FIT. CUT IN 3 TO 5 DAYS.";
-    a.$(".rc-nav").innerHTML = "<span>BUILD YOUR JEANS</span><span>VINTAGE</span><span>REPAIRS</span><span>VISIT</span>";
-    a.$(".rc-txt").textContent = "A denim workshop in Venice Beach. Build your pair online, see the ready date, pick it up in 3 to 5 days. Vintage Levi's and repairs too.";
-    a.$$(".rc-txt")[1].textContent = "Open daily. Hours update from the panel.";
-    a.$(".rc-btn").textContent = "Build your pair";
-    await a.wait(2400); await a.tap(".rc-btn");
-    a.chapter(2); a.url("yourbrand.com/build"); a.scene("build"); await a.wait(700);
-    function pick(group, name){ var bs = a.$$('[data-g="'+group+'"] b'); var el; bs.forEach(function(b){ var on = b.textContent === name; b.classList.toggle("on", on); if (on) el = b; }); return el; }
-    function chip(group, name){ var bs = a.$$('[data-g="'+group+'"] b'); for (var i = 0; i < bs.length; i++) if (bs[i].textContent === name) return bs[i]; }
-    await a.tap(chip("fit","Straight")); pick("fit","Straight"); a.$("#leg").setAttribute("d", FITS.Straight); await a.wait(500);
-    await a.tap(chip("wash","Rinse")); pick("wash","Rinse"); a.$("#leg").style.fill = WASH.Rinse; await a.wait(500);
-    await a.tap(chip("thread","Copper")); pick("thread","Copper"); a.$("#st").style.stroke = THREAD.Copper; await a.wait(500);
-    await a.tap(chip("hem","Chain stitch")); pick("hem","Chain stitch"); a.$("#rd").textContent = "FRIDAY, OCT 9"; await a.wait(900);
-    await a.tap("#ord"); await a.toast("Deposit paid · order #1042 · ready Friday", 2000);
-    a.chapter(3); a.url("yourbrand.com/admin/orders"); a.scene("board"); await a.wait(600);
-    var cols = a.$$("#cols .col"), mv = a.$("#mv");
-    function place(i){ var cs = cols[i].querySelectorAll(".card"), last = cs[cs.length-1]; mv.style.left = (cols[i].offsetLeft + 8) + "px"; mv.style.width = (cols[i].offsetWidth - 16) + "px"; mv.style.top = (last.offsetTop + last.offsetHeight + 6) + "px"; }
-    mv.style.transition = "none"; place(0); void mv.offsetWidth; mv.style.transition = ""; mv.style.opacity = 1;
-    await a.go(mv); await a.wait(1100);
-    for (var i = 1; i < 4; i++) { place(i); await a.wait(300); await a.go(mv); await a.wait(900); }
-    a.chapter(4); await a.toast("Text sent to Maya: your jeans are ready for pickup.", 3400);
-  }
-};
-
 /* ---------- LALOO ---------- */
 var LL_TXT = {
   EN:{s:"Restroom near me",q:"Where to?", t1:"Public restroom · Windward Plaza", r1:"<b>3 min</b> walk · Free · ★ 4.6 · Open now", go:"Walk there", ad:"On your way · 1 min off route", ad2:"Vintage and coastal apparel. Show laloo for 10% off.", sp:"Local · sponsored"},
@@ -358,7 +278,7 @@ var LALOO = {
   }
 };
 
-var DEFS = { heron: HERON, rufcut: RUFCUT, laloo: LALOO };
+var DEFS = { heron: HERON, laloo: LALOO };
 function mount(el){ if (el.__player) return el.__player; var d = DEFS[el.getAttribute("data-demo")]; if (d) el.__player = new Player(el, d); return el.__player; }
 window.MrDemos = { mount: mount };
 document.querySelectorAll("[data-demo]:not([data-lazy])").forEach(mount);

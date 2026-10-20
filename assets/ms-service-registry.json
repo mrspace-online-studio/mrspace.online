@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "retired": [
+    {
+      "site": "rufcut",
+      "paths": ["/rufcut", "/panel/rufcut"],
+      "hosts": ["rufcutjeans.com", "www.rufcutjeans.com"],
+      "assetNames": ["rufcut", "og-rufcut", "workspace-demo.webp"],
+      "legacyPages": ["studio-direction/index.html"]
+    }
+  ]
+}

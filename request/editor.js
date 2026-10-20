@@ -4,7 +4,7 @@ const $ = s => document.querySelector(s);
 const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const cfg=window.MS_CONFIG,frame=$('#site'),qs=new URLSearchParams(location.search),EDIT=qs.get('e');
 let KEY=qs.get('k');
-const SELF=qs.get('self')==='rufcut';
+const SELF=false;
 if(SELF)document.body.classList.add('self-publish');
 const EMPTY='[Remove the text in this area]',NOTE='\n\nNote: ',GENERAL='__general',uuid=v=>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v||'');
 const S={items:new Map(),doc:null,win:null,parts:[],selected:null,view:'areas',editing:true,sub:null,quota:null,siteName:'',other:'',name:'',email:'',dirty:false,busy:false,storage:'',storageOK:true,restored:false,search:'',filter:'all',pending:null,approved:[]};
@@ -300,7 +300,7 @@ function fromServer(c){
   header();sidebarTitle(t.areas,t.choose);
   const demo=qs.get('preview');
   if(demo&&!KEY&&!EDIT){
-    const pages={mrspace:['/','Mr. Space'],rufcut:['/rufcut/','Rufcut']},page=pages[demo];
+    const pages={mrspace:['/','Mr. Space'],'space-tailoring':['/space-tailoring/','Space Tailoring']},page=pages[demo];
     if(!page)return fatal();S.demo=true;S.siteName=page[1];S.storage='';header();
     frame.addEventListener('load',()=>wire().then(()=>{$('#draftStatus').textContent=t.demoNote;}).catch(()=>fatal(t.err)));frame.src=page[0];return;
   }
@@ -310,7 +310,7 @@ function fromServer(c){
     else{d=await rpc('ms_client_view',{p_key:KEY});if(!d)throw new Error('badlink');S.siteName=d.name||d.site||'';}
     S.quota=d.quota;
     // Keep capability URLs out of browser storage keys. Only content drafts are kept on this device, never access keys or contact details.
-    const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(SELF?'self:rufcut:'+JSON.parse(localStorage.getItem('ms_panel')).email+':'+lang:EDIT||KEY));S.storage='ms-request-draft:'+Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,'0')).join('');
+    const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(SELF?'self:inactive:'+JSON.parse(localStorage.getItem('ms_panel')).email+':'+lang:EDIT||KEY));S.storage='ms-request-draft:'+Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,'0')).join('');
     try{
       const saved=JSON.parse(localStorage.getItem(S.storage)||'null');
       if(saved?.version===1&&Date.now()-saved.at<7*86400000&&Array.isArray(saved.items)&&saved.items.length<=(S.self?500:40)){

@@ -7,9 +7,12 @@ Mr. Space web stüdyosu sitesi. Ekim 2026 planına göre yeniden yazıldı.
 - `packages/` : Paket 1-2-3, ilk müşteri indirimi, karşılaştırma tablosu, ekler, saatlik ücret, Custom çıkış bedeli, değişiklik kotası, kurallar, SSS.
 - `first-clients/` : İlk müşteri (launch offer) sayfası. Normal fiyatların üstü çizili, $300 kurulum, $50/ay, eklentiler dahil, değişiklik kotası iki katı. Ana sayfa ve paketler sayfasındaki siyah şerit buraya gider.
 - `start/` : Dallanan başvuru formu (8 adım). POS, scanner, printer, etiket, mevcut site, sosyal medya, örnek siteler. “Submit project” özel admin başvuru kuyruğuna kayıt yapar ve gerçek makbuz numarası bekler (`ms-intake` kurulum gerektirir). E-posta ve kopyalama seçenekleri korunur. Başarısız gönderimde taslak ziyaretçinin cihazında kalır.
-- `rufcut/` : Doğrudan bağlantıyla açık kalan eski konsept; ana sayfada tanıtılmaz, yayın paketinde noindex.
+- `rufcut/` : Kullanım dışı bırakılmış eski yol; yayın paketinde yalnız ortak hizmet sonlandırma sayfası çıkar.
 - `space-tailoring/` : Santa Monica, 3rd Street için bağımsız terzilik markası. Tek tasarlayıcıda jean, çanta ve ceket seçilir; tamir, fiş takibi ve ayrı panel bulunur. Ayrıntılar: [ms/SPACE-TAILORING.md](ms/SPACE-TAILORING.md).
 - `404.html`, `sitemap.xml`, `robots.txt`, `CNAME`, `og.png`
+
+## Hizmet sonlandırma
+`/service-unavailable/`, eski site/panel ve özel düzenleme bağlantıları için ortak uyarı sayfasıdır. Yeni başvuru `/start/` üzerinden açılır. Kurulum, yeniden kullanım ve doğrulama: [ms/SERVICE-RETIREMENT.md](ms/SERVICE-RETIREMENT.md).
 
 ## Ortak dosyalar
 - `assets/site.css` : Renkler, yazılar, cetvel, butonlar, etiket kartları. Açık ve koyu tema.
