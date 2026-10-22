@@ -56,30 +56,26 @@
   const card = p => `
     <a class="card rv" href="#/piece/${p.id}" aria-label="${esc(p.title)}, ${money(p.price)}">
       <div class="ph">
-        <span class="badge">${p.line === "Archive" ? "Archive" : "Designer"}</span>
+
         <img class="main" src="${IMG + p.cut}" alt="" loading="lazy" decoding="async">
         <img class="alt" src="${IMG + p.photo}" alt="" loading="lazy" decoding="async">
       </div>
       <div class="meta">
-        <div><div class="who">${esc(p.maker)}</div><div class="t">${esc(p.title.split(" · ").pop())}</div></div>
-        <div class="p">${money(p.price)}<small>or made to you</small></div>
+        <div><div class="who">${esc(p.maker)} / ${p.line}</div><div class="t">${esc(p.title.split(" · ").pop())}</div></div>
+        <div class="p">${money(p.price)}<small>Piece price</small></div>
       </div>
     </a>`;
 
   /* ---------- sections ---------- */
   const hero = () => `
     <section class="hero" aria-label="Prova">
-      <img src="${IMG}campaign-ivory.webp" alt="A woman in an ivory linen top and wide trousers in front of stone architecture" fetchpriority="high">
       <div class="hero-in">
-        <p class="eyebrow">Venice Beach · Archive and designer pieces</p>
+        <p class="eyebrow">Archive & independent design</p>
         <h1 class="display">Made to you.</h1>
-        <p class="lead">Rare archive pieces and independent designers, finished to your measurements in our Venice atelier. Take a piece as it is, or let it become yours.</p>
-        <div class="hero-ctas">
-          <a class="btn btn-light" href="#/edit">Explore the Edit</a>
-          <a class="btn btn-ghost" href="#/club">Prova Club</a>
-        </div>
+        <p class="lead">Considered pieces. A personal fit.<br>A wardrobe that could only be yours.</p>
+        <div class="hero-ctas"><a class="btn" href="#/edit">Explore the Edit <span aria-hidden="true">↗</span></a></div>
       </div>
-      <span class="concept">Campaign concept</span>
+      <figure class="hero-image"><img src="${IMG}campaign-ivory.webp" alt="A woman in an ivory linen ensemble against stone architecture" fetchpriority="high"><figcaption class="concept">Campaign concept</figcaption></figure>
     </section>`;
 
   const definition = () => `
@@ -110,12 +106,12 @@
     </div></section>`;
 
   const editTeaser = () => `
-    <section class="sec" style="padding-top:0"><div class="wrap">
+    <section class="sec edit-selection"><div class="wrap">
       <div class="edit-head">
-        <div><p class="eyebrow">The Edit</p><h2 class="h1" style="margin-top:12px">This season's pieces</h2></div>
+        <div><p class="eyebrow">The Edit</p><h2 class="h1" style="margin-top:12px">A considered selection</h2></div>
         <a class="link" href="#/edit">See all pieces</a>
       </div>
-      <div class="grid">${PIECES.slice(0, 6).map(card).join("")}</div>
+      <div class="grid">${PIECES.slice(0, 3).map(card).join("")}</div>
     </div></section>`;
 
   const atelier = (full) => `
@@ -146,10 +142,10 @@
       <div class="split" style="align-items:end">
         <div class="stack rv">
           <p class="eyebrow">Prova Club</p>
-          <h2 class="h1">Your measurements, kept. Your pieces, made to you.</h2>
+          <h2 class="h1">The luxury of being understood.</h2>
         </div>
         <div class="stack rv">
-          <p class="lead">Membership is how Prova works. One measurement profile, a personal stylist who knows it, and fittings throughout the year.</p>
+          <p class="lead">A wardrobe, personally considered. One measurement profile, a personal stylist who knows it, and fittings throughout the year.</p>
           ${full ? "" : `<p><a class="btn btn-light" href="#/club">Become a member</a></p>`}
         </div>
       </div>
@@ -188,22 +184,19 @@
   /* ---------- views ---------- */
   const views = {
     home() {
-      return hero() + definition() + ways() + editTeaser() + clubBlock(false) + atelier(false) + designer() + privateBlock(false) + steps();
+      return hero() + editTeaser() + definition() + atelier(false) + clubBlock(false);
     },
 
     edit(params) {
       const line = params.get("line") || "All";
-      const list = line === "All" ? PIECES : PIECES.filter(p => p.line === line);
-      const chip = v => `<button class="chip" data-line="${v}" aria-pressed="${line === v}">${v === "All" ? "All pieces" : v === "Archive" ? "Archive" : "Designers"}</button>`;
-      return `
-        <section class="sec" style="padding-top:140px"><div class="wrap">
-          <div class="edit-head">
-            <div><p class="eyebrow">The Edit</p><h1 class="h1" style="margin-top:12px">Chosen one by one.</h1>
-            <p class="lead" style="margin-top:16px">Archive pieces from Heron CA and designer pieces from Iwona Ash. Each one inspected in Venice, each one available as it is or made to you.</p></div>
-            <div class="chips" role="group" aria-label="Filter">${["All", "Archive", "Designer"].map(chip).join("")}</div>
-          </div>
-          <div class="grid">${list.map(card).join("")}</div>
-        </div></section>`;
+      const category = params.get("category") || "All";
+      const list = PIECES.filter(p => (line === "All" || p.line === line) && (category === "All" || p.category === category));
+      const chips = (values, key, selected) => values.map(v => `<button class="chip" data-filter="${key}" data-value="${v}" aria-pressed="${selected === v}">${v === "All" ? "All" : v}</button>`).join("");
+      return `<section class="sec edit-page"><div class="wrap">
+        <div class="collection-title"><p class="eyebrow">The Edit</p><h1 class="h1">Chosen one by one.</h1><p class="lead">Archive finds and independent design. Available as they are, or made to you.</p></div>
+        <div class="filter-bar"><div class="filter-groups"><div class="chips" role="group" aria-label="Collection">${chips(["All", "Archive", "Designer"], "line", line)}</div><div class="chips" role="group" aria-label="Category">${chips(["All", "Layers", "Dresses", "Tops"], "category", category)}</div></div><p class="fine" role="status">${list.length} pieces</p></div>
+        <div class="grid">${list.length ? list.map(card).join("") : `<div class="empty-state"><h2 class="h2">No pieces in this selection.</h2><p>Explore another category, or return to the full Edit.</p><a class="link" href="#/edit">View all pieces</a></div>`}</div>
+      </div></section>`;
     },
 
     piece(params, id) {
@@ -217,7 +210,7 @@
             <div class="gallery">
               <div class="g cut"><img src="${IMG + p.cut}" alt="${esc(p.title)}"></div>
               <div class="g"><img src="${IMG + p.photo}" alt="${esc(p.title)} on a form in the Heron CA store" loading="lazy"></div>
-              <div class="g"><img src="${IMG}campaign-atelier.webp" alt="A fitting in the atelier" loading="lazy" style="object-position:30% 50%"></div>
+              <div class="fit-detail"><p class="eyebrow">The personal fit</p><h2 class="h2">Line. Length. Balance.</h2><p>${esc(p.fit)}</p><a class="link" href="#/club">Discover Prova Club</a></div>
             </div>
             <div class="info">
               <p class="eyebrow">${esc(p.maker)} · ${esc(p.line)}</p>
@@ -226,17 +219,17 @@
               <div class="opts" role="radiogroup" aria-label="How would you like it">
                 <button class="opt" role="radio" aria-checked="true" data-opt="asis">
                   <span class="dot"></span>
-                  <span><span class="ot">As it is</span><span class="od" style="display:block">Exactly as it arrived. Ships in 1 to 3 days.</span></span>
+                  <span><span class="ot">As it is</span><span class="od" style="display:block">The piece, as selected. No fitting included.</span></span>
                   <span class="op">${money(p.price)}</span>
                 </button>
-                <button class="opt" role="radio" aria-checked="false" data-opt="made">
+                <button class="opt" role="radio" aria-checked="false" tabindex="-1" data-opt="made">
                   <span class="dot"></span>
-                  <span><span class="ot">Made to you</span><span class="od" style="display:block">${esc(p.fit)} For Prova Club members, using a fitting from your membership.</span></span>
-                  <span class="op">${money(p.price)}</span>
+                  <span><span class="ot">Made to you</span><span class="od" style="display:block">${esc(p.fit)} Club members use a fitting from their membership. Non-members may arrange a fitting, charged separately.</span></span>
+                  <span class="op">${money(p.price)}<small>+ fitting</small></span>
                 </button>
               </div>
               <button class="btn" style="width:100%" data-reserve>Reserve this piece</button>
-              <p class="fine" style="margin-top:12px" id="optnote">One piece only. Online ordering opens soon.</p>
+              <p class="fine" style="margin-top:12px" id="optnote">Preview price. Online ordering opens soon; no payment is collected.</p>
               <dl class="specs">
                 <div><dt>Maker</dt><dd>${esc(p.maker)}</dd></div>
                 <div><dt>Category</dt><dd>${esc(p.category)}</dd></div>
@@ -259,13 +252,13 @@
           <div class="split" style="align-items:start">
             <div class="stack">
               <p class="eyebrow">Prova Club · Los Angeles</p>
-              <h1 class="h1">Membership is how Prova works.</h1>
+              <h1 class="h1">A wardrobe, personally considered.</h1>
               <p class="lead">Members can have any piece made to them. Your measurement profile is taken once and kept, a personal stylist looks after you, and fittings are part of the year.</p>
             </div>
             <div class="stack">
               <div class="plans" role="radiogroup" aria-label="Membership">
-                <button class="plan" role="radio" aria-pressed="true" data-plan="month"><span class="muted">Monthly</span><span class="pp">$250</span><span class="muted">per month</span></button>
-                <button class="plan" role="radio" aria-pressed="false" data-plan="year"><span class="muted">Yearly</span><span class="pp">$2,500</span><span class="muted">per year, two months included</span></button>
+                <button class="plan" role="radio" aria-checked="true" tabindex="0" data-plan="month"><span class="muted">Monthly</span><span class="pp">$250</span><span class="muted">per month</span></button>
+                <button class="plan" role="radio" aria-checked="false" tabindex="-1" data-plan="year"><span class="muted">Yearly</span><span class="pp">$2,500</span><span class="muted">per year, two months included</span></button>
               </div>
               <form class="form" id="join" novalidate style="margin-top:20px">
                 <div class="field"><label for="jn">Name</label><input id="jn" name="name" autocomplete="name" required></div>
@@ -273,7 +266,7 @@
                 <div class="field"><label for="jc">Where are you based</label>
                   <select id="jc" name="city"><option>Los Angeles, Westside</option><option>Los Angeles, other</option><option>Elsewhere, join the waitlist</option></select></div>
                 <button class="btn btn-light" type="submit" style="margin-top:8px">Request membership</button>
-                <p class="fine" style="color:rgba(251,248,243,.55)">Preview pricing. Membership opens in Los Angeles first.</p>
+                <p class="fine" >Preview pricing. This form does not save your details or collect payment. Membership opens in Los Angeles first.</p>
               </form>
             </div>
           </div>
@@ -339,10 +332,15 @@
     document.querySelectorAll(".rv").forEach(e => io.observe(e));
   };
 
-  const darkTop = new Set(["home", "private", "club"]);
+  let hasRendered = false;
   let current = "home";
 
   const route = () => {
+    if (location.hash === "#main") { main.focus(); return; }
+    const filterUpdate = hasRendered && current === "edit" && location.hash.startsWith("#/edit?");
+    const activeFilter = document.activeElement?.dataset.filter;
+    const activeValue = document.activeElement?.dataset.value;
+    const previousScroll = window.scrollY;
     const raw = location.hash.replace(/^#\/?/, "");
     const [path, qs] = raw.split("?");
     const parts = path.split("/").filter(Boolean);
@@ -354,11 +352,16 @@
     document.querySelectorAll("[data-nav]").forEach(a => {
       if (a.dataset.nav === name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    document.body.classList.remove("menu-open"); $("#menu").setAttribute("aria-expanded", "false");
+    setMenu(false);
     const titles = { edit: "The Edit", club: "Prova Club", private: "Private Fitting", atelier: "Atelier" };
     const p = name === "piece" && PIECES.find(x => x.id === parts[1]);
     document.title = p ? `${p.title.split(" · ").pop()} · Prova` : titles[name] ? `${titles[name]} · Prova` : "Prova · Made to you";
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: filterUpdate ? previousScroll : 0, behavior: "instant" });
+    const filterTarget = filterUpdate && [...main.querySelectorAll(".chip")].find(el => el.dataset.filter === activeFilter && el.dataset.value === activeValue);
+    if (filterTarget) filterTarget.focus({ preventScroll: true });
+    else if (hasRendered) main.focus({ preventScroll: true });
+    hasRendered = true;
+    enhanceImages();
     onScroll();
     reveal();
   };
@@ -366,17 +369,21 @@
   /* ---------- interactions ---------- */
   main.addEventListener("click", e => {
     const chip = e.target.closest(".chip");
-    if (chip) { location.hash = chip.dataset.line === "All" ? "#/edit" : `#/edit?line=${chip.dataset.line}`; return; }
+    if (chip) {
+      const params = new URLSearchParams(location.hash.split("?")[1] || "");
+      if (chip.dataset.value === "All") params.delete(chip.dataset.filter); else params.set(chip.dataset.filter, chip.dataset.value);
+      location.hash = "#/edit" + (params.size ? "?" + params : ""); return;
+    }
     const opt = e.target.closest(".opt");
     if (opt) {
-      opt.parentElement.querySelectorAll(".opt").forEach(o => o.setAttribute("aria-checked", String(o === opt)));
+      selectRadio(opt);
       $("#optnote").textContent = opt.dataset.opt === "made"
-        ? "Made to you is reserved for Prova Club members. Your stylist will confirm the fitting before work begins."
-        : "One piece only. Online ordering opens soon.";
+        ? "The piece price excludes fitting. Club members use their fitting allowance; non-members are charged separately. Your stylist confirms the details before work begins."
+        : "Preview price. Online ordering opens soon; no payment is collected.";
       return;
     }
     const plan = e.target.closest(".plan");
-    if (plan) { plan.parentElement.querySelectorAll(".plan").forEach(o => o.setAttribute("aria-pressed", String(o === plan))); return; }
+    if (plan) { selectRadio(plan); return; }
     if (e.target.closest("[data-reserve]")) { toast("Online ordering opens soon. Until then, every piece can be seen in Venice by appointment."); }
   });
   main.addEventListener("submit", e => {
@@ -386,17 +393,51 @@
   });
 
   const bar = $("#bar");
-  const onScroll = () => {
-    const solid = !darkTop.has(current) || window.scrollY > window.innerHeight * 0.6 || document.body.classList.contains("menu-open");
-    bar.classList.toggle("solid", solid);
-  };
-  window.addEventListener("scroll", onScroll, { passive: true });
-
-  $("#menu").addEventListener("click", () => {
-    const open = !document.body.classList.contains("menu-open");
+  const menu = $("#menu");
+  const nav = $("#nav");
+  const mobile = matchMedia("(max-width:820px)");
+  const onScroll = () => bar.classList.add("solid");
+  const setMenu = open => {
     document.body.classList.toggle("menu-open", open);
-    $("#menu").setAttribute("aria-expanded", String(open));
-    onScroll();
+    menu.setAttribute("aria-expanded", String(open));
+    menu.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    nav.inert = mobile.matches && !open;
+    main.inert = open;
+    $(".foot").inert = open;
+  };
+  menu.addEventListener("click", () => { const open = menu.getAttribute("aria-expanded") !== "true"; setMenu(open); if (open) nav.querySelector("a").focus(); });
+  mobile.addEventListener("change", () => setMenu(false));
+  document.addEventListener("keydown", e => {
+    if (!document.body.classList.contains("menu-open")) return;
+    if (e.key === "Escape") { setMenu(false); menu.focus(); }
+    if (e.key === "Tab") {
+      const targets = [$(".bar .mark"), ...nav.querySelectorAll("a"), menu];
+      const i = targets.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); menu.focus(); }
+      else if (!e.shiftKey && i === targets.length - 1) { e.preventDefault(); targets[0].focus(); }
+    }
+  });
+  const selectRadio = selected => selected.parentElement.querySelectorAll('[role="radio"]').forEach(el => {
+    el.setAttribute("aria-checked", String(el === selected)); el.tabIndex = el === selected ? 0 : -1;
+  });
+  main.addEventListener("keydown", e => {
+    const radio = e.target.closest('[role="radio"]');
+    if (!radio || !["ArrowDown", "ArrowUp", "ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+    e.preventDefault();
+    const radios = [...radio.parentElement.querySelectorAll('[role="radio"]')];
+    let index = radios.indexOf(radio) + (["ArrowUp", "ArrowLeft"].includes(e.key) ? -1 : 1);
+    if (e.key === "Home") index = 0; if (e.key === "End") index = radios.length - 1;
+    const next = radios[(index + radios.length) % radios.length]; next.click(); next.focus();
+  });
+  const enhanceImages = () => main.querySelectorAll("img").forEach(img => {
+    const source = img.getAttribute("src");
+    if (!source?.endsWith(".webp")) return;
+    const base = source.slice(0, -5);
+    const filename = source.split("/").pop();
+    const width = filename.startsWith("campaign-") ? 1536 : filename === "iwona-portrait.webp" ? 452 : filename === "iwona-leather-overall.webp" ? 670 : filename === "heron-tahari-leather.webp" ? 1000 : filename.includes("cutout") || filename === "heron-tahari-v2.webp" ? 1086 : 1050;
+    img.srcset = [width > 480 && `${base}-480.webp 480w`, width > 960 && `${base}-960.webp 960w`, `${source} ${width}w`].filter(Boolean).join(", ");
+    img.sizes = img.closest(".card") ? "(max-width: 560px) 46vw, (max-width: 1000px) 46vw, 30vw" : "(max-width: 820px) 100vw, 60vw";
+    img.decoding = "async";
   });
 
   window.addEventListener("hashchange", route);
