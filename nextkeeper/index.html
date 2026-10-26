@@ -6,47 +6,45 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Next Keeper · Home for Wayward Garments</title>
   <meta name="description" content="Next Keeper is a shelter for clothes with a past. Read each resident's file and adopt the one that should come home with you.">
-  <meta name="theme-color" content="#D5DFD7">
+  <meta name="theme-color" content="#E3E9E0">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2240 20 320 190%22%3E%3Cpath d=%22M200 104V90c0-10 16-16 16-34 0-18-13-28-26-28-14 0-22 10-22 22M200 110c-24 14-90 46-136 66-14 6-14 18 2 18h268c16 0 16-12 2-18-46-20-112-52-136-66%22 fill=%22none%22 stroke=%22%231D2A2C%22 stroke-width=%2214%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
   <link rel="canonical" href="https://mrspace.online/nextkeeper/">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=IM+Fell+English:ital@0;1&family=Jost:wght@400;500&family=Special+Elite&family=Work+Sans:wght@400;500&display=swap">
-  <link rel="stylesheet" href="/nextkeeper/nk.css?v=20261025">
-  <script src="/nextkeeper/nk.js?v=20261025" defer></script>
+  <link rel="stylesheet" href="/nextkeeper/nk.css?v=20261025-editorial">
+  <script src="/nextkeeper/nk.js?v=20261025-editorial" defer></script>
 </head>
 <body>
-<div class="notice tw">Preview · sample residents · the shelter opens soon</div>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="notice"><span>Venice Beach, California</span><span>Preview · sample residents</span></div>
 
 <header class="top">
   <a class="brand" href="./" aria-label="Next Keeper home">
     <span class="brand-icon" data-hanger></span>
     <span>Next Keeper</span>
   </a>
-  <nav class="nav">
+  <nav class="nav" aria-label="Main navigation">
     <a href="#today-sec">Today's resident</a>
     <a href="#shelter">The shelter</a>
     <a href="#adoption">Adoption</a>
     <a href="#rules">House rules</a>
   </nav>
-  <a class="btn small-btn" href="#shelter">Meet them</a>
+  <a class="btn small-btn" href="#shelter">The residents <span aria-hidden="true">↗</span></a>
 </header>
 
-<main>
-  <section class="hero">
+<main id="main">
+  <section class="hero" data-ms-section="opening">
     <div class="hero-copy">
-      <p class="eyebrow tw">Home for Wayward Garments · Est. <span data-year>2026</span></p>
-      <h1>They are still <em>waiting for a home.</em></h1>
-      <p class="lede">Every piece here arrived with a past and no one to wear it. We take them in, mend what needs mending, write down their story and find each one its next keeper.</p>
+      <p class="eyebrow tw">A shelter for clothes with a past</p>
+      <h1 data-ms-field="opening.title">They are still<br><em>waiting</em><br>for a home.</h1>
+      <p class="lede" data-ms-field="opening.description">Every piece here arrived with a past and no one to wear it. We take them in, mend what needs mending, write down their story and find each one its next keeper.</p>
       <div class="hero-actions">
-        <a class="btn" href="#shelter">Meet the residents</a>
-        <a class="btn ghost" href="#adoption">How adoption works</a>
+        <a class="btn" href="#shelter">Meet the residents <span aria-hidden="true">↗</span></a>
+        <a class="text-link" href="#adoption">How adoption works <span aria-hidden="true">↗</span></a>
       </div>
-      <p class="hero-note">Every story is true. <em>Some more than others.</em></p>
+      <p class="hero-note tw">One piece. One story. A next keeper.</p>
     </div>
     <div class="stage-wrap">
       <div id="stage" class="stage" aria-label="Residents waiting today"></div>
-      <p class="stage-cap tw">Visiting the shelter now</p>
+      <p class="stage-cap tw"><span>From the shelter archive</span><span>Est. <span data-year>2026</span></span></p>
     </div>
   </section>
 
@@ -54,30 +52,36 @@
     <div><span class="tw">Residents</span><strong id="lg-total">10</strong></div>
     <div><span class="tw">Waiting</span><strong id="lg-wait">6</strong></div>
     <div><span class="tw">Longest stay</span><strong id="lg-long">88 days</strong></div>
-    <div><span class="tw">Adopted this week</span><strong>1</strong></div>
+    <div><span class="tw">Adopted</span><strong id="lg-adopted">1</strong></div>
   </section>
 
-  <section id="today-sec" class="section">
+  <section class="manifesto" data-ms-section="philosophy">
+    <p class="eyebrow tw">A second life, well lived.</p>
+    <h2 data-ms-field="philosophy.title">Every story is true.<br><em>Some more than others.</em></h2>
+    <p>We don't sell clothes. We sell what they've been through. Probably.</p>
+  </section>
+
+  <section id="today-sec" data-ms-section="today-sec" class="section">
     <div class="sec-head">
       <p class="eyebrow tw">Today's resident</p>
-      <h2>One of them gets the window today.</h2>
+      <h2>A life before yours.</h2>
     </div>
     <div id="today" class="today"></div>
   </section>
 
-  <section id="shelter" class="section">
+  <section id="shelter" data-ms-section="shelter" class="section">
     <div class="sec-head row">
       <div>
         <p class="eyebrow tw">The shelter</p>
         <h2>Meet the residents.</h2>
       </div>
-      <p id="count" class="count tw"></p>
+      <p id="count" class="count tw" aria-live="polite"></p>
     </div>
     <div id="filters" class="filters" role="toolbar" aria-label="Filter residents"></div>
     <div id="grid" class="grid"></div>
   </section>
 
-  <section id="adoption" class="section">
+  <section id="adoption" data-ms-section="adoption" class="section">
     <div class="sec-head">
       <p class="eyebrow tw">Adoption</p>
       <h2>Three steps to take one home.</h2>
@@ -101,7 +105,7 @@
     </ol>
   </section>
 
-  <section id="rules" class="section rules">
+  <section id="rules" data-ms-section="rules" class="section rules">
     <div class="rules-copy">
       <p class="eyebrow tw">House rules</p>
       <h2>Clothes aren't meant to wait.</h2>
@@ -109,7 +113,7 @@
         <li><span class="tw">I.</span> Every resident is one of a kind. When it is adopted, it is gone.</li>
         <li><span class="tw">II.</span> The intake file tells you the truth about size, cloth and condition.</li>
         <li><span class="tw">III.</span> The story is how we remember it. Every story is true. Some more than others.</li>
-        <li><span class="tw">IV.</span> The longest residents are seen first and their adoption fee gets lower.</li>
+        <li><span class="tw">IV.</span> A resident stays with us until the right keeper comes along.</li>
       </ul>
     </div>
     <div class="cert" aria-label="Sample adoption certificate">
@@ -122,12 +126,91 @@
 </main>
 
 <footer class="foot">
-  <div class="foot-logo" data-logo></div>
+  <a class="footer-wordmark" href="#main">Next Keeper<span aria-hidden="true">↗</span></a>
   <p class="tw">Next Keeper by Heron CA · Venice Beach, California</p>
   <p class="foot-small">Preview build. Residents, fees and stories on this page are samples.</p>
 </footer>
 
 <dialog id="fileDialog" class="file-dialog" aria-label="Intake file"><div id="file"></div></dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script type="application/json" id="ms-editor-config">
+{
+  "version": 1,
+  "page": {
+    "en": "Next Keeper",
+    "tr": "Next Keeper",
+    "es": "Next Keeper",
+    "de": "Next Keeper",
+    "fr": "Next Keeper"
+  },
+  "sections": {
+    "opening": {
+      "en": "Opening",
+      "tr": "Açılış",
+      "es": "Inicio",
+      "de": "Einstieg",
+      "fr": "Ouverture"
+    },
+    "philosophy": {
+      "en": "Philosophy",
+      "tr": "Marka yaklaşımı",
+      "es": "Filosofía",
+      "de": "Philosophie",
+      "fr": "Philosophie"
+    },
+    "today-sec": {
+      "en": "Today’s resident",
+      "tr": "Günün sakini",
+      "es": "Residente del día",
+      "de": "Bewohner des Tages",
+      "fr": "Résident du jour"
+    },
+    "shelter": {
+      "en": "The shelter",
+      "tr": "Barınak",
+      "es": "El refugio",
+      "de": "Das Zuhause",
+      "fr": "Le refuge"
+    },
+    "adoption": {
+      "en": "Adoption",
+      "tr": "Sahiplenme",
+      "es": "Adopción",
+      "de": "Adoption",
+      "fr": "Adoption"
+    },
+    "rules": {
+      "en": "House rules",
+      "tr": "Ev kuralları",
+      "es": "Reglas",
+      "de": "Hausregeln",
+      "fr": "Règles"
+    }
+  },
+  "fields": {
+    "opening.title": {
+      "en": "Headline",
+      "tr": "Ana başlık",
+      "es": "Título",
+      "de": "Überschrift",
+      "fr": "Titre"
+    },
+    "opening.description": {
+      "en": "Introduction",
+      "tr": "Giriş",
+      "es": "Introducción",
+      "de": "Einleitung",
+      "fr": "Introduction"
+    },
+    "philosophy.title": {
+      "en": "Brand statement",
+      "tr": "Marka cümlesi",
+      "es": "Manifiesto",
+      "de": "Markenaussage",
+      "fr": "Manifeste"
+    }
+  }
+}
+</script>
 </body>
 </html>

@@ -112,17 +112,15 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   };
-  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   /* the intake photo: same wall, same height lines, same slate for every resident */
   function shot(r) {
-    var local = window.NK_PREVIEW === true;
     var piece = r.img
       ? '<span class="piece">' +
-          (!local && r.hanger ? '<svg class="piece-hanger" viewBox="0 0 1086 1448" aria-hidden="true"><path d="' + r.hanger + '"/></svg>' : '') +
-          '<img src="' + (local ? r.img : "/linenshirt/images/studio/" + r.src + ".webp") + '" alt="' + esc(r.nick + ", " + r.name) + '" loading="lazy">' +
+          (r.hanger ? '<svg class="piece-hanger" viewBox="0 0 1086 1448" aria-hidden="true"><path d="' + r.hanger + '"/></svg>' : '') +
+          '<img src="' + r.img + '" alt="' + esc(r.nick + ", " + r.name) + '" loading="lazy" width="1086" height="1448">' +
         '</span>'
-      : '<span class="empty-hanger" aria-hidden="true">' + hangerIcon("#c9d3cf", 3.4) + '</span>';
-    var txt = r.status === "arriving" ? "arrived today" : (r.day === 1 ? "day here" : "days here");
+      : '<span class="empty-hanger" aria-hidden="true">' + hangerIcon(INK, 3.4) + '</span>';
+    var txt = r.status === "arriving" ? "intake pending" : (r.day === 1 ? "day here" : "days here");
     return '<span class="shot">' + piece +
       '<span class="tag"><span class="tag-hole"></span><span class="tag-no">No. ' + r.no + '</span><span class="tag-nick">' + esc(r.nick) + '</span>' +
       '<span class="tag-day">' + (r.status === "arriving" ? "&middot;" : r.day) + '</span><span class="tag-txt">' + txt + '</span></span>' +
@@ -131,7 +129,7 @@
 
 
   /* ---------- drawn assets: logo, hanger icon and the corridor backdrop ---------- */
-  var INK = "#1D2A2C", VIOLET = "#4E3F86";
+  var INK = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim(), VIOLET = getComputedStyle(document.documentElement).getPropertyValue("--stamp").trim();
   var HANGER_PATH = "M200 104V90c0-10 16-16 16-34 0-18-13-28-26-28-14 0-22 10-22 22M193 98l14 5M193 106l14 5M200 110c-24 14-90 46-136 66-14 6-14 18 2 18h268c16 0 16-12 2-18-46-20-112-52-136-66";
   function hangerIcon(color, sw) {
     return '<svg viewBox="40 20 320 190" aria-hidden="true"><path d="' + HANGER_PATH + '" fill="none" stroke="' + color + '" stroke-width="' + (sw || 4.2) + '" stroke-linecap="round" stroke-linejoin="round"/><circle cx="168" cy="51" r="3.6" fill="' + color + '"/></svg>';
@@ -222,51 +220,12 @@
 
   var available = RESIDENTS.filter(function (r) { return r.status !== "adopted" && r.status !== "arriving"; });
 
-  /* ---------- hero: three intake cards that keep changing places ---------- */
-  function heroCard(r, pos) {
-    return '<button class="intake p' + pos + '" data-no="' + r.no + '" aria-label="Meet ' + esc(r.name) + '">' +
-      '<span class="intake-hole" aria-hidden="true"></span>' +
-      '<span class="intake-photo">' + shot(r) + '</span>' +
-      '<span class="intake-label"><span class="tw">No. ' + r.no + ' · ' + esc(r.nick) + '</span><span class="intake-name">' + esc(r.name) + '</span></span>' +
-      '</button>';
-  }
-
+  /* A quiet window display. No autoplay or moving targets. */
   function initHero() {
-    var stage = $("#stage");
-    if (!stage) return;
-    var order = [0, 2, 4]; // indexes into available, front card is position 1
-    var pool = available.map(function (_, i) { return i; });
-    stage.innerHTML = order.map(function (idx, pos) { return heroCard(available[idx], pos); }).join("");
-    stage.addEventListener("click", function (e) {
-      var b = e.target.closest(".intake");
-      if (b) openPiece(b.getAttribute("data-no"));
-    });
-    if (reduced) return;
-    var paused = false;
-    stage.addEventListener("mouseenter", function () { paused = true; });
-    stage.addEventListener("mouseleave", function () { paused = false; });
-    var next = 0;
-    setInterval(function () {
-      if (paused || document.hidden) return;
-      var cards = stage.querySelectorAll(".intake");
-      // the back-left card leaves, the others shift, a new resident arrives
-      var leaving = stage.querySelector(".p0");
-      var front = stage.querySelector(".p1");
-      var right = stage.querySelector(".p2");
-      leaving.classList.add("leaving");
-      front.classList.remove("p1"); front.classList.add("p0");
-      right.classList.remove("p2"); right.classList.add("p1");
-      var shown = Array.prototype.map.call(cards, function (c) { return c.getAttribute("data-no"); });
-      var cand;
-      do { cand = available[pool[next++ % pool.length]]; } while (shown.indexOf(cand.no) > -1);
-      var tmp = document.createElement("div");
-      tmp.innerHTML = heroCard(cand, 2);
-      var incoming = tmp.firstChild;
-      incoming.classList.add("arriving");
-      stage.appendChild(incoming);
-      requestAnimationFrame(function () { requestAnimationFrame(function () { incoming.classList.remove("arriving"); }); });
-      setTimeout(function () { leaving.remove(); }, 700);
-    }, 3800);
+    var r = available.find(function (piece) { return piece.no === "003"; }) || available[0];
+    $("#stage").innerHTML = '<button class="hero-resident" data-open="' + r.no + '" aria-label="Read ' + esc(r.nick) + '\'s intake file">' + shot(r).replace('loading="lazy"', 'loading="eager" fetchpriority="high"') + '</button>' +
+      '<div class="window-caption"><span class="tw">In the window · No. ' + r.no + '</span><span class="window-name">' + esc(r.nick) + '</span><span>' + esc(r.name) + '</span></div>' +
+      '<span class="window-index tw" aria-hidden="true">NK / ' + r.no + '</span>';
   }
 
   /* ---------- today's resident ---------- */
@@ -336,19 +295,19 @@
     var grid = $("#grid");
     var list = RESIDENTS.filter(match);
     grid.innerHTML = list.length ? list.map(cardHTML).join("") : '<p class="empty">No residents here right now.</p>';
-    $("#count").textContent = available.length + " waiting · 3 arriving · 1 adopted this week";
+    $("#count").textContent = (filter === "All" ? "" : list.length + " shown · ") + available.length + " waiting · " + RESIDENTS.filter(function (r) { return r.status === "arriving"; }).length + " arriving";
   }
 
   function initFilters() {
     var bar = $("#filters");
     bar.innerHTML = FILTERS.map(function (f) {
-      return '<button class="filter' + (f === filter ? " on" : "") + '" data-f="' + f + '">' + f + '</button>';
+      return '<button class="filter' + (f === filter ? " on" : "") + '" aria-pressed="' + (f === filter) + '" data-f="' + f + '">' + f + '</button>';
     }).join("");
     bar.addEventListener("click", function (e) {
       var b = e.target.closest(".filter");
       if (!b) return;
       filter = b.getAttribute("data-f");
-      bar.querySelectorAll(".filter").forEach(function (x) { x.classList.toggle("on", x === b); });
+      bar.querySelectorAll(".filter").forEach(function (x) { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", String(x === b)); });
       renderGrid();
     });
   }
@@ -357,7 +316,7 @@
   var dlg;
   function openPiece(no) {
     var r = RESIDENTS.filter(function (x) { return x.no === no; })[0];
-    if (!r) return;
+    if (!r || r.status === "arriving") return;
     var adopted = r.status === "adopted";
     $("#file").innerHTML =
       '<button class="close" data-close aria-label="Close">×</button>' +
@@ -376,6 +335,7 @@
           (adopted
             ? '<p class="found">This one found its next keeper.</p>'
             : '<div class="today-actions"><button class="btn" data-adopt="' + r.no + '">Adopt me · $' + r.fee + '</button><span class="small">Comes with an adoption certificate.</span></div>') +
+          '<p id="dialogNotice" class="dialog-notice" role="status" aria-live="polite"></p>' +
           '<p class="fine">Every story is true. Some more than others. The intake details above are checked by hand.</p>' +
         '</div>' +
       '</div>';
@@ -391,7 +351,9 @@
   /* ---------- adoption (preview only) ---------- */
   function adopt(no) {
     var r = RESIDENTS.filter(function (x) { return x.no === no; })[0];
-    toast("Preview only. " + r.name + " will be adoptable when the shelter opens.");
+    var message = "Preview only. " + r.name + " will be adoptable when the shelter opens.";
+    if (dlg.open) $("#dialogNotice").textContent = message;
+    else toast(message);
   }
 
   var tt;
@@ -425,6 +387,7 @@
     var setTxt = function (id, v) { var n = document.getElementById(id); if (n) n.textContent = v; };
     setTxt("lg-total", RESIDENTS.length);
     setTxt("lg-wait", available.length);
+    setTxt("lg-adopted", RESIDENTS.filter(function (r) { return r.status === "adopted"; }).length);
     setTxt("lg-long", longest + " days");
     var m = location.hash.match(/^#no-(\d{3})$/);
     if (m) openPiece(m[1]);
