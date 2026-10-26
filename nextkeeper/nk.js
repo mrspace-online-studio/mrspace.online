@@ -136,7 +136,7 @@
           '<img src="' + r.img + '" alt="' + esc(r.nick + ", " + r.name) + '" loading="lazy" width="1086" height="1448">' +
         '</span>'
       : '<span class="empty-hanger" aria-hidden="true">' + hangerIcon("#9aa6a2", 3.4) + '</span>';
-    return '<span class="shot">' + piece + (r.status === 'queued' ? '' : '<span class="archive-tag"><span>No. ' + r.no + '</span><i>' + esc(r.nick) + '</i><span>' + Math.max(0,r.day) + ' days here</span></span>') + '</span>';
+    return '<span class="shot">' + piece + '</span>';
   }
 
   /* ---------- drawn assets: logo, hanger icon and the corridor backdrop ---------- */
@@ -344,16 +344,16 @@
     });
   }
   function cardHTML(r) {
-    var tone = r.anniversary ? "milestone" : r.status === "new" ? "new" : "since";
+    var tag = r.anniversary ? '<span class="status milestone">' + residency(r) + '</span>'
+      : r.status === "new" ? '<span class="status new">' + residency(r) + '</span>' : '';
     return '<article class="resident">' +
       '<button class="resident-photo" type="button" data-open="' + r.no + '" aria-label="Open the file of ' + esc(r.nick) + '">' +
-        shot(r) + '<span class="status ' + tone + '">' + residency(r) + '</span>' +
+        shot(r) + tag +
       '</button>' +
       '<div class="resident-body">' +
-        '<div class="resident-meta"><span>No. ' + r.no + '</span><span>' + esc(r.size.split(",")[0]) + '</span></div>' +
-        '<h3><button type="button" data-open="' + r.no + '">' + esc(r.nick) + '</button></h3>' +
-        '<p class="resident-line">' + esc(r.name) + '. ' + esc(r.story[0]) + '</p>' +
-        '<div class="resident-buy"><span class="fee"><small>Adoption fee</small>' + money(r.fee) + '</span>' + adoptLabel(r) + '</div>' +
+        '<div class="resident-row"><h3><button type="button" data-open="' + r.no + '">' + esc(r.nick) + '</button></h3><span class="fee">' + money(r.fee) + '</span></div>' +
+        '<p class="resident-sub">' + esc(r.name) + ' · ' + esc(r.size.split(",")[0]) + '</p>' +
+        adoptLabel(r) +
       '</div>' +
     '</article>';
   }
