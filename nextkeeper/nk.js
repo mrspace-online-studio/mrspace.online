@@ -87,23 +87,38 @@
         "I'm new. Say hello."
       ]
     },
-    { no: "008", nick: "Betula", latin: "the birch", name: "Arriving", img: "", type: "Arriving", arrived: "2026-10-24", fee: 0, status: "arriving", story: ["", "", "", ""] },
-    { no: "009", nick: "Olea", latin: "the olive", name: "Arriving", img: "", type: "Arriving", arrived: "2026-10-25", fee: 0, status: "arriving", story: ["", "", "", ""] },
-    { no: "010", nick: "Tilia", latin: "the linden", name: "Arriving", img: "", type: "Arriving", arrived: "2026-10-25", fee: 0, status: "arriving", story: ["", "", "", ""] }
+    { no: "008", nick: "Betula", latin: "the birch", name: "On the way", teaser: "A pale linen coat coming down from the north.", img: "", type: "Queue", arrived: "2026-10-27", fee: 0, status: "queued", story: ["", "", "", ""] },
+    { no: "009", nick: "Olea", latin: "the olive", name: "On the way", teaser: "A green summer dress that has seen a lot of terraces.", img: "", type: "Queue", arrived: "2026-10-28", fee: 0, status: "queued", story: ["", "", "", ""] },
+    { no: "010", nick: "Tilia", latin: "the linden", name: "On the way", teaser: "A soft cardigan that smells faintly of tea.", img: "", type: "Queue", arrived: "2026-10-29", fee: 0, status: "queued", story: ["", "", "", ""] }
   ];
 
   var NOW = new Date();
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   RESIDENTS.forEach(function (r) {
     var a = new Date(r.arrived + "T12:00:00");
-    r.day = Math.max(1, Math.floor((NOW - a) / 864e5));
+    r.arrivedAt = a;
+    r.day = Math.floor((NOW - a) / 864e5);
+    if (r.status !== "adopted") r.status = (r.day < 0 || !r.img) ? "queued" : (r.day < 7 ? "new" : "waiting");
+    var m = (NOW.getFullYear() - a.getFullYear()) * 12 + NOW.getMonth() - a.getMonth() - (NOW.getDate() < a.getDate() ? 1 : 0);
+    r.months = Math.max(0, m);
+    r.anniversary = r.months > 0 && NOW.getDate() === a.getDate();
   });
+  function ordinal(n) { return ["", "first", "second", "third", "fourth", "fifth", "sixth"][n] || (n + "th"); }
+  function since(r) { return MONTHS[r.arrivedAt.getMonth()] + " " + r.arrivedAt.getFullYear(); }
+  function residency(r) {
+    if (r.status === "queued") return "Intake pending";
+    if (r.anniversary) return r.months + (r.months === 1 ? " month" : " months") + " here today";
+    if (r.status === "new") return r.day === 0 ? "Arrived today" : "New this week";
+    return "Resident since " + since(r);
+  }
 
   var STATUS = {
     waiting: "Waiting",
     new: "New resident",
     longest: "Longest resident",
     adopted: "Adopted",
-    arriving: "Being photographed"
+    queued: "On the way"
   };
 
   var $ = function (s, r) { return (r || document).querySelector(s); };
@@ -112,24 +127,20 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   };
-  /* the intake photo: same wall, same height lines, same slate for every resident */
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* the intake photo: every resident in the same corridor of hangers */
   function shot(r) {
     var piece = r.img
       ? '<span class="piece">' +
           (r.hanger ? '<svg class="piece-hanger" viewBox="0 0 1086 1448" aria-hidden="true"><path d="' + r.hanger + '"/></svg>' : '') +
           '<img src="' + r.img + '" alt="' + esc(r.nick + ", " + r.name) + '" loading="lazy" width="1086" height="1448">' +
         '</span>'
-      : '<span class="empty-hanger" aria-hidden="true">' + hangerIcon(INK, 3.4) + '</span>';
-    var txt = r.status === "arriving" ? "intake pending" : (r.day === 1 ? "day here" : "days here");
-    return '<span class="shot">' + piece +
-      '<span class="tag"><span class="tag-hole"></span><span class="tag-no">No. ' + r.no + '</span><span class="tag-nick">' + esc(r.nick) + '</span>' +
-      '<span class="tag-day">' + (r.status === "arriving" ? "&middot;" : r.day) + '</span><span class="tag-txt">' + txt + '</span></span>' +
-      '</span>';
+      : '<span class="empty-hanger" aria-hidden="true">' + hangerIcon("#9aa6a2", 3.4) + '</span>';
+    return '<span class="shot">' + piece + (r.status === 'queued' ? '' : '<span class="archive-tag"><span>No. ' + r.no + '</span><i>' + esc(r.nick) + '</i><span>' + Math.max(0,r.day) + ' days here</span></span>') + '</span>';
   }
 
-
   /* ---------- drawn assets: logo, hanger icon and the corridor backdrop ---------- */
-  var INK = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim(), VIOLET = getComputedStyle(document.documentElement).getPropertyValue("--stamp").trim();
+  var INK = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim(), VIOLET = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
   var HANGER_PATH = "M200 104V90c0-10 16-16 16-34 0-18-13-28-26-28-14 0-22 10-22 22M193 98l14 5M193 106l14 5M200 110c-24 14-90 46-136 66-14 6-14 18 2 18h268c16 0 16-12 2-18-46-20-112-52-136-66";
   function hangerIcon(color, sw) {
     return '<svg viewBox="40 20 320 190" aria-hidden="true"><path d="' + HANGER_PATH + '" fill="none" stroke="' + color + '" stroke-width="' + (sw || 4.2) + '" stroke-linecap="round" stroke-linejoin="round"/><circle cx="168" cy="51" r="3.6" fill="' + color + '"/></svg>';
@@ -218,160 +229,253 @@
     document.documentElement.style.setProperty("--corridor", "url(" + url + ")");
   }
 
-  var available = RESIDENTS.filter(function (r) { return r.status !== "adopted" && r.status !== "arriving"; });
+  var available = RESIDENTS.filter(function (r) { return r.status === "new" || r.status === "waiting"; });
+  var queue = RESIDENTS.filter(function (r) { return r.status === "queued"; }).sort(function (a, b) { return a.arrivedAt - b.arrivedAt; });
+  var homed = RESIDENTS.filter(function (r) { return r.status === "adopted"; });
+  var byNo = function (no) { return RESIDENTS.filter(function (x) { return x.no === no; })[0]; };
+  var money = function (n) { return "$" + n; };
 
-  /* A quiet window display. No autoplay or moving targets. */
+  /* ---------- the keeper's bag ---------- */
+  var bag = [];
+  function inBag(no) { return bag.indexOf(no) > -1; }
+  function addToBag(no) {
+    var r = byNo(no);
+    if (!r || inBag(no) || r.status === "adopted" || r.status === "queued") { openBag(); return; }
+    bag.push(no);
+    renderBag();
+    var b = $(".bag-btn"); b.classList.remove("bump"); void b.offsetWidth; b.classList.add("bump");
+    if (dlg.open) $("#fileNotice").textContent = r.nick + " is in your preview bag. This does not reserve the piece.";
+    else toast(r.nick + " is in your preview bag.");
+    refreshButtons();
+  }
+  function removeFromBag(no) {
+    bag = bag.filter(function (x) { return x !== no; });
+    renderBag(); refreshButtons();
+    var target = $("#bagItems [data-remove]") || $("[data-bag-close]");
+    target.focus();
+  }
+  function renderBag() {
+    $("#bagCount").textContent = bag.length;
+    var total = 0;
+    $("#bagItems").innerHTML = bag.length ? bag.map(function (no) {
+      var r = byNo(no); total += r.fee;
+      return '<div class="bag-item"><div class="bag-thumb">' + shot(r) + '</div>' +
+        '<div><span class="mono">No. ' + r.no + ' · ' + esc(r.nick) + '</span><h3>' + esc(r.name) + '</h3>' +
+        '<button class="remove" type="button" data-remove="' + r.no + '">Leave on the hanger</button></div>' +
+        '<b>' + money(r.fee) + '</b></div>';
+    }).join("") : '<p class="bag-empty">Your bag is empty. Somebody out there is still waiting.</p>';
+    $("#bagTotal").textContent = money(total);
+    $("#bagNotice").textContent = "";
+  }
+  function openBag() {
+    if (dlg.open) closePiece();
+    $("#bagNotice").textContent = "";
+    if (!$("#bag").open) $("#bag").showModal();
+  }
+  function closeBag() { if ($("#bag").open) $("#bag").close(); }
+  function adoptLabel(r) {
+    return '<button class="adopt-btn' + (inBag(r.no) ? " in" : "") + '" type="button" data-adopt="' + r.no + '">' + (inBag(r.no) ? "In your bag" : "Adopt me") + '</button>';
+  }
+  function refreshButtons() {
+    document.querySelectorAll("[data-adopt]").forEach(function (b) {
+      var on = inBag(b.getAttribute("data-adopt"));
+      b.classList.toggle("in", on);
+      if (b.classList.contains("adopt-btn")) b.textContent = on ? "In your bag" : "Adopt me";
+      else b.textContent = on ? "In your bag" : "Adopt me · " + money(byNo(b.getAttribute("data-adopt")).fee);
+    });
+  }
+
+  /* ---------- hero: three residents that keep changing places ---------- */
+  function heroCard(r, pos) {
+    return '<button class="intake p' + pos + '" data-no="' + r.no + '" aria-label="Meet ' + esc(r.nick) + ', ' + esc(r.name) + '">' +
+      '<span class="intake-photo">' + shot(r).replace('loading="lazy"', 'loading="eager"') + '</span>' +
+      '<span class="intake-label"><span class="intake-name">' + esc(r.nick) + '</span><span class="mono">' + money(r.fee) + '</span></span>' +
+      '</button>';
+  }
   function initHero() {
-    var r = available.find(function (piece) { return piece.no === "003"; }) || available[0];
-    $("#stage").innerHTML = '<button class="hero-resident" data-open="' + r.no + '" aria-label="Read ' + esc(r.nick) + '\'s intake file">' + shot(r).replace('loading="lazy"', 'loading="eager" fetchpriority="high"') + '</button>' +
-      '<div class="window-caption"><span class="tw">In the window · No. ' + r.no + '</span><span class="window-name">' + esc(r.nick) + '</span><span>' + esc(r.name) + '</span></div>' +
-      '<span class="window-index tw" aria-hidden="true">NK / ' + r.no + '</span>';
+    var stage = $("#stage");
+    if (!stage || available.length < 3) return;
+    var order = [0, 1, 2];
+    var front = available.slice().sort(function (a, b) { return a.day - b.day; });
+    var pool = front.map(function (_, i) { return i; });
+    stage.innerHTML = order.map(function (idx, pos) { return heroCard(front[idx], pos); }).join("");
+    stage.addEventListener("click", function (e) { var b = e.target.closest(".intake"); if (b) openPiece(b.getAttribute("data-no")); });
+    var paused = false, next = 3, manualPause = reduced;
+    var toggle = $("#motionToggle");
+    function motionState() { toggle.textContent = manualPause ? "Play rotation" : "Pause rotation"; toggle.setAttribute("aria-pressed", String(manualPause)); }
+    motionState();
+    toggle.addEventListener("click", function () { manualPause = !manualPause; motionState(); });
+    stage.addEventListener("mouseenter", function () { paused = true; });
+    stage.addEventListener("mouseleave", function () { paused = false; });
+    setInterval(function () {
+      if (paused || manualPause || document.hidden || front.length <= 3 || stage.contains(document.activeElement) || dlg.open || $("#bag").open) return;
+      var cards = stage.querySelectorAll(".intake");
+      var leaving = stage.querySelector(".p0"), f = stage.querySelector(".p1"), right = stage.querySelector(".p2");
+      leaving.classList.add("leaving");
+      f.classList.remove("p1"); f.classList.add("p0");
+      right.classList.remove("p2"); right.classList.add("p1");
+      var shown = Array.prototype.map.call(cards, function (c) { return c.getAttribute("data-no"); });
+      var cand;
+      do { cand = front[pool[next++ % pool.length]]; } while (shown.indexOf(cand.no) > -1);
+      var tmp = document.createElement("div");
+      tmp.innerHTML = heroCard(cand, 2);
+      var incoming = tmp.firstChild;
+      incoming.classList.add("arriving");
+      stage.appendChild(incoming);
+      requestAnimationFrame(function () { requestAnimationFrame(function () { incoming.classList.remove("arriving"); }); });
+      setTimeout(function () { leaving.remove(); }, 800);
+    }, 3800);
+  }
+
+  /* ---------- the residents (shop grid) ---------- */
+  var filter = "All", sort = "newest";
+  var FILTERS = ["All", "New this week", "Dresses", "Tops", "Shirts", "Jackets"];
+  function match(r) {
+    if (filter === "All") return true;
+    if (filter === "New this week") return r.status === "new";
+    return r.type === filter;
+  }
+  function sorted(list) {
+    return list.slice().sort(function (a, b) {
+      if (sort === "longest") return b.day - a.day;
+      if (sort === "low") return a.fee - b.fee;
+      if (sort === "high") return b.fee - a.fee;
+      return a.day - b.day;
+    });
+  }
+  function cardHTML(r) {
+    var tone = r.anniversary ? "milestone" : r.status === "new" ? "new" : "since";
+    return '<article class="resident">' +
+      '<button class="resident-photo" type="button" data-open="' + r.no + '" aria-label="Open the file of ' + esc(r.nick) + '">' +
+        shot(r) + '<span class="status ' + tone + '">' + residency(r) + '</span>' +
+      '</button>' +
+      '<div class="resident-body">' +
+        '<div class="resident-meta"><span>No. ' + r.no + '</span><span>' + esc(r.size.split(",")[0]) + '</span></div>' +
+        '<h3><button type="button" data-open="' + r.no + '">' + esc(r.nick) + '</button></h3>' +
+        '<p class="resident-line">' + esc(r.name) + '. ' + esc(r.story[0]) + '</p>' +
+        '<div class="resident-buy"><span class="fee"><small>Adoption fee</small>' + money(r.fee) + '</span>' + adoptLabel(r) + '</div>' +
+      '</div>' +
+    '</article>';
+  }
+  function renderGrid() {
+    var list = sorted(available.filter(match));
+    $("#resultCount").textContent = list.length + (list.length === 1 ? " resident" : " residents") + " · " + $("#sort").selectedOptions[0].textContent;
+    $("#grid").innerHTML = list.length ? list.map(cardHTML).join("") : '<p class="bag-empty">No residents here right now.</p>';
+  }
+  function initFilters() {
+    var bar = $("#filters");
+    bar.innerHTML = FILTERS.map(function (f) { return '<button class="chip-btn' + (f === filter ? " on" : "") + '" aria-pressed="' + (f === filter) + '" type="button" data-f="' + f + '">' + f + '</button>'; }).join("");
+    bar.addEventListener("click", function (e) {
+      var b = e.target.closest(".chip-btn"); if (!b) return;
+      filter = b.getAttribute("data-f");
+      bar.querySelectorAll(".chip-btn").forEach(function (x) { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", String(x === b)); });
+      renderGrid();
+    });
+    $("#sort").addEventListener("change", function (e) { sort = e.target.value; renderGrid(); });
+  }
+
+  /* ---------- coming and going ---------- */
+  function renderComing() {
+    var el = $("#coming");
+    if (!el) return;
+    el.innerHTML = queue.map(function (r, i) {
+      return '<article class="mini queued">' +
+        '<div class="mini-photo">' + shot(r) + '<span class="status soon">' + residency(r) + '</span></div>' +
+        '<div class="mini-body"><span class="mono">No. ' + r.no + ' · ' + esc(r.latin) + '</span><h3>' + esc(r.nick) + '</h3><p>' + esc(r.teaser || "") + '</p></div>' +
+      '</article>';
+    }).join("") + homed.map(function (r) {
+      return '<article class="mini homed">' +
+        '<div class="mini-photo">' + shot(r) + '<span class="status home">Found a home</span></div>' +
+        '<div class="mini-body"><span class="mono">No. ' + r.no + ' · adopted</span><h3>' + esc(r.nick) + '</h3><p>' + esc(r.story[3]) + '</p></div>' +
+      '</article>';
+    }).join("");
   }
 
   /* ---------- today's resident ---------- */
   function today() {
-    var d = new Date();
-    var start = new Date(d.getFullYear(), 0, 0);
+    var pick = available.filter(function (r) { return r.anniversary; })[0] || available.filter(function (r) { return r.day === 0; })[0];
+    if (pick) return pick;
+    var d = new Date(), start = new Date(d.getFullYear(), 0, 0);
     var doy = Math.floor((d - start) / 864e5);
-    return available[doy % available.length];
+    var list = available.slice().sort(function (a, b) { return b.day - a.day; });
+    return list[doy % list.length];
   }
-
-  function kunye(r) {
-    return '<dl class="kunye tw">' +
-      '<dt>Called</dt><dd>' + esc(r.nick) + ', ' + esc(r.latin) + '</dd>' +
-      '<dt>Breed</dt><dd>' + esc(r.breed) + '</dd>' +
-      '<dt>Size</dt><dd>' + esc(r.size) + '</dd>' +
-      '<dt>Temperament</dt><dd>' + esc(r.temperament) + '</dd>' +
-      '<dt>Health</dt><dd>' + esc(r.health) + '</dd>' +
-      '<dt>Arrived</dt><dd>Day ' + r.day + ' on the hanger</dd>' +
-      '</dl>';
+  function headline(r) {
+    if (r.anniversary) return esc(r.nick) + ' turns <em>' + r.months + (r.months === 1 ? ' month' : ' months') + '</em> with us today.';
+    if (r.day === 0) return esc(r.nick) + ' <em>arrived today.</em>';
+    if (r.status === "new") return esc(r.nick) + ' is <em>new this week.</em>';
+    return 'Meet ' + esc(r.nick) + ', <em>with us since ' + MONTHS[r.arrivedAt.getMonth()] + '.</em>';
   }
-
   function initToday() {
-    var r = today();
-    var el = $("#today");
-    if (!el) return;
+    var r = today(), el = $("#today");
+    if (!el || !r) return;
     el.innerHTML =
-      '<div class="today-photo"><span class="today-ribbon">Today\'s resident</span>' + shot(r) + '</div>' +
-      '<div class="today-file">' +
-        '<div class="file-head"><span class="tw">Intake file · No. ' + r.no + '</span><span class="stamp-ink">' + STATUS[r.status] + '</span></div>' +
-        '<p class="nick">' + esc(r.nick) + '</p><h3>' + esc(r.name) + '</h3>' +
-        '<p class="tale">' + r.story.map(esc).join(" ") + '</p>' +
-        kunye(r) +
-        '<div class="today-actions"><button class="btn" data-adopt="' + r.no + '">Adopt me · $' + r.fee + '</button>' +
-        '<button class="btn ghost" data-open="' + r.no + '">Read my file</button></div>' +
+      '<div class="today-photo">' + shot(r) + '</div>' +
+      '<div class="today-body">' +
+        '<p class="kicker">Today\'s resident · No. ' + r.no + ' · ' + esc(r.latin) + '</p>' +
+        '<h2>' + headline(r) + '</h2>' +
+        '<p class="today-tale">' + esc(r.story[1]) + ' ' + esc(r.story[2]) + '</p>' +
+        '<ul class="facts"><li>' + esc(r.name) + '</li><li>' + esc(r.size) + '</li><li>' + esc(r.health.split(".")[0]) + '</li></ul>' +
+        '<div class="today-actions"><button class="btn" type="button" data-adopt="' + r.no + '">Adopt me · ' + money(r.fee) + '</button>' +
+        '<button class="btn ghost" type="button" data-open="' + r.no + '">Read the file</button></div>' +
       '</div>';
   }
 
-  /* ---------- the shelter (grid) ---------- */
-  var filter = "All";
-  var FILTERS = ["All", "New residents", "Longest residents", "Dresses", "Tops", "Shirts", "Jackets", "Sets"];
-
-  function match(r) {
-    if (filter === "All") return true;
-    if (filter === "New residents") return r.status === "new" || r.status === "arriving";
-    if (filter === "Longest residents") return r.day >= 50 && r.status !== "adopted";
-    return r.type === filter;
-  }
-
-  function cardHTML(r) {
-    var adopted = r.status === "adopted", arriving = r.status === "arriving";
-    return '<article class="resident' + (adopted ? " is-adopted" : "") + (arriving ? " is-arriving" : "") + '">' +
-      (arriving ? '' : '<button class="resident-hit" data-open="' + r.no + '" aria-label="Open the file of ' + esc(r.nick) + '"></button>') +
-      '<div class="resident-photo">' + shot(r) +
-        (adopted ? '<span class="adopted-stamp">Adopted</span>' : '') +
-      '</div>' +
-      '<div class="resident-body">' +
-        '<div class="resident-top tw"><span>No. ' + r.no + ' · ' + esc(r.nick) + '</span><span>' + (arriving ? 'New' : 'Day ' + r.day) + '</span></div>' +
-        '<h3>' + (arriving ? 'Just arrived' : esc(r.name)) + '</h3>' +
-        '<p class="resident-line">' + (arriving ? 'Still settling in. Their photo and file are being prepared.' : esc(r.story[0])) + '</p>' +
-        '<div class="resident-foot"><span class="chip ' + r.status + '">' + STATUS[r.status] + '</span>' +
-        '<span class="fee">' + (adopted ? 'Found a home' : arriving ? 'Soon' : 'Adoption fee $' + r.fee) + '</span></div>' +
-      '</div>' +
-    '</article>';
-  }
-
-  function renderGrid() {
-    var grid = $("#grid");
-    var list = RESIDENTS.filter(match);
-    grid.innerHTML = list.length ? list.map(cardHTML).join("") : '<p class="empty">No residents here right now.</p>';
-    $("#count").textContent = (filter === "All" ? "" : list.length + " shown · ") + available.length + " waiting · " + RESIDENTS.filter(function (r) { return r.status === "arriving"; }).length + " arriving";
-  }
-
-  function initFilters() {
-    var bar = $("#filters");
-    bar.innerHTML = FILTERS.map(function (f) {
-      return '<button class="filter' + (f === filter ? " on" : "") + '" aria-pressed="' + (f === filter) + '" data-f="' + f + '">' + f + '</button>';
-    }).join("");
-    bar.addEventListener("click", function (e) {
-      var b = e.target.closest(".filter");
-      if (!b) return;
-      filter = b.getAttribute("data-f");
-      bar.querySelectorAll(".filter").forEach(function (x) { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", String(x === b)); });
-      renderGrid();
-    });
-  }
-
-  /* ---------- the file (piece dialog) ---------- */
+  /* ---------- the intake file ---------- */
   var dlg;
   function openPiece(no) {
-    var r = RESIDENTS.filter(function (x) { return x.no === no; })[0];
-    if (!r || r.status === "arriving") return;
+    var r = byNo(no);
+    if (!r || r.status === "queued") return;
     var adopted = r.status === "adopted";
     $("#file").innerHTML =
-      '<button class="close" data-close aria-label="Close">×</button>' +
+      '<button class="icon-btn close" type="button" data-close aria-label="Close">×</button>' +
       '<div class="file-grid">' +
-        '<div class="file-photo">' + shot(r) + (adopted ? '<span class="adopted-stamp big">Adopted</span>' : '') + '</div>' +
+        '<div class="file-photo">' + shot(r) + '</div>' +
         '<div class="file-body">' +
-          '<div class="file-head"><span class="tw">Intake file · No. ' + r.no + '</span><span class="stamp-ink">' + STATUS[r.status] + '</span></div>' +
-          '<p class="nick">' + esc(r.nick) + ' <span>' + esc(r.latin) + '</span></p><h2>' + esc(r.name) + '</h2>' +
+          '<p class="kicker">Intake file · No. ' + r.no + ' · ' + esc(r.latin) + '</p>' +
+          '<h2>' + esc(r.nick) + ', <em>' + esc(r.name.replace(/^The /, "the ")) + '</em></h2>' +
           '<ol class="tale-parts">' +
-            '<li><span class="tw">Who I am</span>' + esc(r.story[0]) + '</li>' +
-            '<li><span class="tw">How I got here</span>' + esc(r.story[1]) + '</li>' +
-            '<li><span class="tw">What I deserve</span>' + esc(r.story[2]) + '</li>' +
-            '<li><span class="tw">Please</span>' + esc(r.story[3]) + '</li>' +
+            '<li><span class="mono">Who I am</span>' + esc(r.story[0]) + '</li>' +
+            '<li><span class="mono">How I got here</span>' + esc(r.story[1]) + '</li>' +
+            '<li><span class="mono">What I deserve</span>' + esc(r.story[2]) + '</li>' +
+            '<li><span class="mono">Please</span>' + esc(r.story[3]) + '</li>' +
           '</ol>' +
-          kunye(r) +
+          '<dl class="spec"><dt>Breed</dt><dd>' + esc(r.breed) + '</dd><dt>Size</dt><dd>' + esc(r.size) + '</dd>' +
+            '<dt>Temperament</dt><dd>' + esc(r.temperament) + '</dd><dt>Health</dt><dd>' + esc(r.health) + '</dd>' +
+            '<dt>Resident</dt><dd>Since ' + since(r) + '</dd></dl>' +
           (adopted
             ? '<p class="found">This one found its next keeper.</p>'
-            : '<div class="today-actions"><button class="btn" data-adopt="' + r.no + '">Adopt me · $' + r.fee + '</button><span class="small">Comes with an adoption certificate.</span></div>') +
-          '<p id="dialogNotice" class="dialog-notice" role="status" aria-live="polite"></p>' +
-          '<p class="fine">Every story is true. Some more than others. The intake details above are checked by hand.</p>' +
+            : '<div class="buy-row"><span class="fee"><small>Adoption fee</small>' + money(r.fee) + '</span>' +
+              '<button class="btn" type="button" data-adopt="' + r.no + '">' + (inBag(r.no) ? "In your bag" : "Adopt me · " + money(r.fee)) + '</button></div>' +
+              '<p class="fine-print">One of a kind. Ships with a numbered adoption certificate. Every story is true. Some more than others.</p>') +
+          '<p id="fileNotice" class="dialog-notice" role="status" aria-live="polite"></p>' +
         '</div>' +
       '</div>';
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
     history.replaceState(null, "", "#no-" + r.no);
   }
-
-  function closePiece() {
-    if (dlg.open) dlg.close();
-    history.replaceState(null, "", location.pathname + location.search);
-  }
-
-  /* ---------- adoption (preview only) ---------- */
-  function adopt(no) {
-    var r = RESIDENTS.filter(function (x) { return x.no === no; })[0];
-    var message = "Preview only. " + r.name + " will be adoptable when the shelter opens.";
-    if (dlg.open) $("#dialogNotice").textContent = message;
-    else toast(message);
-  }
+  function closePiece() { if (dlg.open) dlg.close(); history.replaceState(null, "", location.pathname + location.search); }
 
   var tt;
   function toast(msg) {
     var t = $("#toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    clearTimeout(tt);
-    tt = setTimeout(function () { t.classList.remove("show"); }, 3600);
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("show"); }, 3200);
   }
 
   document.addEventListener("click", function (e) {
+    var a = e.target.closest("[data-adopt]");
+    if (a) { if (inBag(a.getAttribute("data-adopt"))) openBag(); else addToBag(a.getAttribute("data-adopt")); return; }
     var o = e.target.closest("[data-open]");
     if (o) { openPiece(o.getAttribute("data-open")); return; }
-    var a = e.target.closest("[data-adopt]");
-    if (a) { adopt(a.getAttribute("data-adopt")); return; }
+    var rm = e.target.closest("[data-remove]");
+    if (rm) { removeFromBag(rm.getAttribute("data-remove")); return; }
+    if (e.target.closest("[data-bag-open]")) { openBag(); return; }
+    if (e.target.closest("[data-bag-close]") || e.target === $("#bag")) { closeBag(); return; }
+    if (e.target.closest("[data-checkout]")) { $("#bagNotice").textContent = bag.length ? "Preview only. Adoption opens with the shelter. No payment has been taken." : "Pick a resident first."; return; }
     if (e.target.closest("[data-close]") || e.target === dlg) closePiece();
   });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeBag(); });
 
   document.addEventListener("DOMContentLoaded", function () {
     try { corridor(); } catch (e) {}
@@ -379,18 +483,10 @@
     document.querySelectorAll("[data-hanger]").forEach(function (n) { n.innerHTML = hangerIcon(INK); });
     dlg = $("#fileDialog");
     dlg.addEventListener("close", function () { history.replaceState(null, "", location.pathname + location.search); });
-    initHero();
-    initToday();
-    initFilters();
-    renderGrid();
-    var longest = available.reduce(function (m, r) { return Math.max(m, r.day); }, 0);
+    initHero(); initFilters(); renderGrid(); renderComing(); initToday(); renderBag();
     var setTxt = function (id, v) { var n = document.getElementById(id); if (n) n.textContent = v; };
-    setTxt("lg-total", RESIDENTS.length);
-    setTxt("lg-wait", available.length);
-    setTxt("lg-adopted", RESIDENTS.filter(function (r) { return r.status === "adopted"; }).length);
-    setTxt("lg-long", longest + " days");
+    setTxt("st-wait", available.length); setTxt("st-queue", queue.length); setTxt("st-homed", homed.length);
     var m = location.hash.match(/^#no-(\d{3})$/);
     if (m) openPiece(m[1]);
-    document.querySelectorAll("[data-year]").forEach(function (n) { n.textContent = new Date().getFullYear(); });
   });
 })();

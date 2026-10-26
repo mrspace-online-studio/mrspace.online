@@ -21,3 +21,13 @@ Otomatik dönen eğik kartlar tek büyük vitrinle değiştirilmiştir. Koridor 
 - `git diff --check`
 
 `noindex` korunur. Square ve ödeme bağlantısı bu tasarım çalışmasının kapsamında değildir. Canlı yayın yapılmamıştır.
+
+## Claude tasarımıyla birleştirme
+
+Kullanıcının Claude sürümünü tercih etmesi üzerine, onun yerel `homepage-2026/nextkeeper` dosyalarındaki açık gri-yeşil palet, Instrument Serif / Geist tipografisi, üst üste giysi vitrini, yuvarlak kartlar, sıralama, yaklaşan sakinler ve çanta arayüzü temel alındı. Önceki sürümün yerel fotoğraf altyapısı, küçük arşiv etiketleri, iki marka cümlesi, düzenleyici kimlikleri ve erişilebilir durum bildirimleri taşındı. Logo Cormorant Garamond olarak kaldı. Yeni fontlar resmi Google Fonts kaynağından lisanslarıyla yerel sunulur.
+
+Çanta native dialog kullanır: odak içeride tutulur, Escape ile kapanır. Giysi dosyasında ekleme bildirimi aynı pencerede görünür; çantaya geçerken dosya kapanır. Aynı parça iki kez eklenmez, kaldırılan parça toplamdan düşer. Çantadan kaldırma sonrası odak kalan kaldırma düğmesine veya kapatma düğmesine döner. Ödeme/rezervasyon yoktur; önizleme açıkça belirtilir.
+
+Otomatik vitrin hareketi duraklatılabilir; reduced-motion tercihinde durur, klavye odağı vitrin içindeyken ve dialog açıkken ilerlemez. Üç veya daha az parça varsa sonsuz seçim döngüsüne girmez. Günlük geliş vaadi ve kesin geliş günü iddiaları yerine kayıt hazırlığı gösterilir. Sayılar gerçek örnek diziden hesaplanır.
+
+Doğrulama: 320/390/768/1024/1440 px sayfa genişliği taşmıyor; küçük ekran filtreleri kendi satırında yatay kayıyor. Fiyat sırası 220/280/300/340/360/380. Shirts boş sonuç, Dresses iki parça gösterir. Dosyadan çantaya geçiş, tekrar ekleme, kaldırma, toplam ve önizleme mesajı gerçek tarayıcıda kontrol edildi.
