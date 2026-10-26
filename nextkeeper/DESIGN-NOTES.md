@@ -37,3 +37,5 @@ Doğrulama: 320/390/768/1024/1440 px sayfa genişliği taşmıyor; küçük ekra
 Claude'un Instrument Serif / Geist tipografisi korunarak büyük marka başlığı, sabit iki fotoğraflı vitrin, çerçevesiz üç sütun katalog ve taş / adaçayı / koyu mürekkep paletine geçildi. Otomatik kart döngüsü kaldırıldı. Kapsül düğmeler, iç içe kartlar ve gölgeler azaltıldı. İçerik, düzenleyici kimlikleri ve çanta davranışı korunur.
 
 Gerçek tarayıcıda masaüstü ve 390 px görünüm incelendi; 320 ve 1440 px sayfa genişliğinde taşma yok. Vitrinden Lavandula dosyası açıldı, çantaya ekleme bildirimi doğrulandı, hata günlüğü temiz. JavaScript sözdizimi ve diff kontrolü başarılı. Önizleme ve ödeme kapsamı değişmedi.
+
+Yayın öncesi ana dala yüklenen Claude v4 (05a5a20) da incelendi ve birleştirildi. Çantaya hızlı dönüş çubuğu ve yalnızca yeni/yıldönümü parçalarında etiket gösterimi taşındı. Hareketli haber şeridi, konuşma balonları ve yuvarlak kartlar yerine kullanıcının premium görünüm isteği için sabit editoryal vitrin korundu.

@@ -450,3 +450,8 @@ body:has(dialog[open]){overflow:hidden}
  .section{padding-top:60px}.sec-head{gap:24px;margin-bottom:20px}.sec-head h2,.adoption h2{font-size:38px}.sort{width:100%;justify-content:space-between}.filters{gap:24px}.chip-btn{font-size:11px;min-height:44px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 14px}.resident{padding:0;border-radius:0}.resident-photo{border-radius:0}.resident-body{padding:13px 0 0;gap:6px}.resident h3{font-size:25px}.resident-meta{font-size:7px;letter-spacing:0}.resident-buy{align-items:flex-start;gap:6px}.fee{font-size:13px}.fee small{font-size:7px}.adopt-btn{font-size:10px;min-height:40px;padding:10px 0}.status,.status.new,.status.milestone{font-size:7px;left:10px;top:10px}.archive-tag{padding:7px 5px;font-size:6px}.archive-tag i{font-size:15px}
  .brand-note{margin-top:60px;padding:65px 0}.brand-note h2{font-size:46px}.brand-note>p:last-child{font-size:11px;max-width:260px;margin:24px auto 0}.coming{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 14px}.mini-body h3{font-size:23px}.mini-body p{font-size:11px}.mini-body .mono{font-size:8px}.today-body{padding:30px 24px 40px}.today-tale{font-size:23px}.cert{margin:10px 6px}.foot .brand-name{font-size:40px}
 }
+
+/* Claude's quick bag access, aligned with the quiet archive treatment. */
+.dock{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:35;width:min(350px,calc(100% - 32px))}
+.dock button{display:flex;justify-content:space-between;align-items:center;gap:24px;width:100%;padding:16px 22px;background:var(--ink);color:var(--surface);border:1px solid var(--line);font-size:12px;cursor:pointer}
+.dock b{font-weight:400}.foot{padding-bottom:100px}

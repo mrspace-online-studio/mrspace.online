@@ -9,8 +9,8 @@
   <meta name="theme-color" content="#F3F2ED">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2240 20 320 190%22%3E%3Cpath d=%22M200 104V90c0-10 16-16 16-34 0-18-13-28-26-28-14 0-22 10-22 22M200 110c-24 14-90 46-136 66-14 6-14 18 2 18h268c16 0 16-12 2-18-46-20-112-52-136-66%22 fill=%22none%22 stroke=%22%2313201F%22 stroke-width=%2214%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
   <link rel="canonical" href="https://mrspace.online/nextkeeper/">
-  <link rel="stylesheet" href="/nextkeeper/nk.css?v=20261026-editorial">
-  <script src="/nextkeeper/nk.js?v=20261026-editorial" defer></script>
+  <link rel="stylesheet" href="/nextkeeper/nk.css?v=20261026-editorial-final">
+  <script src="/nextkeeper/nk.js?v=20261026-editorial-final" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -28,7 +28,7 @@
   </nav>
   <button class="bag-btn" type="button" data-bag-open aria-label="Open your keeper's bag">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-    <span>Bag</span><b id="bagCount">0</b>
+    <span>Bag</span><b id="bagCount" data-bag-count>0</b>
   </button>
 </header>
 
@@ -122,6 +122,8 @@
   </div>
   <p class="foot-small">Preview build. Residents, fees and stories on this page are samples.</p>
 </footer>
+
+<div id="dock" class="dock" hidden><button type="button" data-bag-open><span><b data-bag-count>0</b> in your bag</span><span id="dockTotal">$0</span><span aria-hidden="true">→</span></button></div>
 
 <dialog id="bag" class="bag" aria-labelledby="bagTitle">
   <div class="bag-head"><h2 id="bagTitle">Your keeper's bag</h2><button type="button" class="icon-btn" data-bag-close aria-label="Close bag">×</button></div>

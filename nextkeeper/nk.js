@@ -254,7 +254,7 @@
     target.focus();
   }
   function renderBag() {
-    $("#bagCount").textContent = bag.length;
+    document.querySelectorAll("[data-bag-count]").forEach(function (n) { n.textContent = bag.length; });
     var total = 0;
     $("#bagItems").innerHTML = bag.length ? bag.map(function (no) {
       var r = byNo(no); total += r.fee;
@@ -264,6 +264,8 @@
         '<b>' + money(r.fee) + '</b></div>';
     }).join("") : '<p class="bag-empty">Your bag is empty. Somebody out there is still waiting.</p>';
     $("#bagTotal").textContent = money(total);
+    $("#dock").hidden = !bag.length;
+    $("#dockTotal").textContent = money(total);
     $("#bagNotice").textContent = "";
   }
   function openBag() {
@@ -325,7 +327,7 @@
     var tone = r.anniversary ? "milestone" : r.status === "new" ? "new" : "since";
     return '<article class="resident">' +
       '<button class="resident-photo" type="button" data-open="' + r.no + '" aria-label="Open the file of ' + esc(r.nick) + '">' +
-        shot(r) + '<span class="status ' + tone + '">' + residency(r) + '</span>' +
+        shot(r) + (r.anniversary || r.status === 'new' ? '<span class="status ' + tone + '">' + (r.anniversary ? residency(r) : 'New') + '</span>' : '') +
       '</button>' +
       '<div class="resident-body">' +
         '<div class="resident-meta"><span>No. ' + r.no + '</span><span>' + esc(r.size.split(",")[0]) + '</span></div>' +
