@@ -1,0 +1,269 @@
+
+:root{
+  /* Ward: pale institutional green walls, enamel cards, iron type, hectograph violet ink, tile teal */
+  --wall:#D5DFD7;--wall-2:#C9D5CC;--wall-3:#BCCAC0;
+  --paper:#F7F8F4;--paper-2:#ECF1ED;--paper-edge:#C3CFC7;
+  --ink:#1D2A2C;--ink-2:#5C6C6B;
+  --chalk:#1D2A2C;--chalk-dim:#53646A;
+  --stamp:#4E3F86;--brass:#2E6B62;
+  --rule:rgba(29,42,44,.17);
+  color-scheme:light;
+  --gutter:clamp(16px,4vw,56px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--wall);color:var(--chalk);font:400 16px/1.6 "Work Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit}
+.tw{font-family:"Special Elite","Courier New",monospace;letter-spacing:.04em}
+em{font-style:italic}
+h1,h2,h3{font-family:"IM Fell English",Georgia,serif;font-weight:400;margin:0;letter-spacing:-.005em}
+
+/* wainscot panelling on the wall */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 119px,rgba(29,42,44,.035) 119px 120px),
+    radial-gradient(1200px 600px at 70% -10%,rgba(255,255,255,.55),transparent 60%),
+    var(--wall)}
+
+.notice{background:var(--ink);color:var(--paper);text-align:center;font-size:12px;padding:7px 16px;text-transform:uppercase;letter-spacing:.18em}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:24px;padding:14px var(--gutter);background:rgba(213,223,215,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand-icon{display:block;width:44px}.brand-icon svg,.cert-seal svg,.foot-logo svg,.empty-hanger svg{display:block;width:100%;height:auto}
+.brand span{font-family:"IM Fell English",Georgia,serif;font-style:italic;font-size:26px;line-height:1}
+.nav{display:flex;gap:26px;margin-left:auto}
+.nav a{text-decoration:none;font-size:14px;color:var(--chalk-dim);transition:color .2s}
+.nav a:hover{color:var(--chalk)}
+
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);font:500 14px "Work Sans",system-ui,sans-serif;letter-spacing:.02em;padding:12px 20px;border-radius:2px;text-decoration:none;cursor:pointer;transition:transform .2s var(--ease),background .2s}
+.btn:hover{transform:translateY(-1px);background:var(--stamp);border-color:var(--stamp)}
+.btn.ghost{background:transparent;color:var(--chalk);border-color:var(--chalk-dim)}
+.btn.ghost:hover{background:transparent;color:var(--stamp);border-color:var(--stamp)}
+.small-btn{padding:9px 14px;font-size:13px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(24px,4vw,64px);align-items:center;padding:clamp(40px,6vw,88px) var(--gutter) clamp(32px,4vw,56px);min-height:min(86dvh,860px)}
+.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin:0 0 18px}
+.hero h1{font-size:clamp(46px,6.4vw,104px);line-height:.95}
+.hero h1 em{color:var(--stamp)}
+.lede{max-width:460px;color:var(--chalk-dim);font-size:17px;margin:26px 0 30px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px}
+.hero-note{font-family:"IM Fell English",Georgia,serif;font-size:20px;color:var(--chalk-dim);margin:34px 0 0}
+
+.stage-wrap{position:relative}
+.stage{position:relative;aspect-ratio:1/1.02;max-width:620px;margin-left:auto}
+.stage-cap{position:absolute;left:0;bottom:-6px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--chalk-dim)}
+.stage-cap::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brass);margin-right:8px;vertical-align:1px;animation:blink 2.4s infinite}
+@keyframes blink{50%{opacity:.25}}
+
+.intake{position:absolute;width:54%;aspect-ratio:3/4.15;padding:0;border:0;cursor:pointer;background:var(--paper);color:var(--ink);border-radius:3px;
+  box-shadow:0 1px 0 var(--paper-edge) inset,0 24px 50px -22px rgba(29,42,44,.45),0 2px 6px rgba(29,42,44,.15);
+  transition:left .7s var(--ease),top .7s var(--ease),transform .7s var(--ease),opacity .6s var(--ease);text-align:left;display:flex;flex-direction:column}
+.intake.p0{left:0;top:12%;transform:rotate(-6deg);z-index:1}
+.intake.p1{left:23%;top:0;transform:rotate(1deg);z-index:3}
+.intake.p2{left:46%;top:15%;transform:rotate(5deg);z-index:2}
+.intake.arriving{left:70%;top:24%;transform:rotate(12deg);opacity:0}
+.intake.leaving{left:-14%;top:22%;transform:rotate(-14deg);opacity:0;z-index:0}
+.intake:hover{transform:rotate(0) translateY(-6px)}
+.intake-hole{position:absolute;top:14px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--wall);box-shadow:0 0 0 3px var(--brass)}
+.intake-hole::after{content:"";position:absolute;left:50%;bottom:100%;width:1.5px;height:60px;background:var(--brass);opacity:.7}
+.intake-stamp{position:absolute;top:22px;right:14px;z-index:2;font-family:"Special Elite","Courier New",monospace;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--stamp);border:2px solid var(--stamp);padding:3px 8px;transform:rotate(8deg);opacity:.85;mix-blend-mode:multiply}
+.intake-photo{flex:1;margin:42px 14px 0;background:var(--paper-2);border:1px solid var(--paper-edge);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;min-height:0}
+.intake-photo img{width:100%;height:100%;object-fit:contain;padding:6% 6% 0;filter:sepia(.12) contrast(1.02)}
+.intake-label{display:flex;flex-direction:column;gap:2px;padding:12px 16px 16px;border-top:1px dashed var(--paper-edge);margin-top:10px}
+.intake-label .tw{font-size:11px;color:var(--ink-2);letter-spacing:.14em}
+.intake-name{font-family:"IM Fell English",Georgia,serif;font-size:clamp(17px,1.6vw,22px);line-height:1.15}
+
+/* ledger strip */
+.ledger{display:grid;grid-template-columns:repeat(4,1fr);margin:0 var(--gutter);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.ledger div{padding:22px 0 22px 20px;border-left:1px solid var(--rule)}
+.ledger div:first-child{border-left:0;padding-left:0}
+.ledger span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--chalk-dim)}
+.ledger strong{font-family:"IM Fell English",Georgia,serif;font-weight:400;font-size:36px;line-height:1.2}
+
+.section{padding:clamp(64px,8vw,120px) var(--gutter) 0}
+.sec-head{margin-bottom:34px}
+.sec-head.row{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.sec-head h2{font-size:clamp(36px,4.4vw,64px);line-height:1}
+.count{font-size:13px;color:var(--chalk-dim);margin:0}
+
+/* today */
+.today{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);background:var(--paper);color:var(--ink);border-radius:3px;overflow:hidden;box-shadow:0 30px 60px -34px rgba(29,42,44,.45)}
+.today-photo{position:relative;background:var(--paper-2);border-right:1px dashed var(--paper-edge);display:flex;align-items:flex-end;justify-content:center;min-height:520px}
+.today-photo img{max-height:600px;object-fit:contain;padding:48px 32px 0;filter:sepia(.1)}
+.today-ribbon{position:absolute;top:24px;left:-6px;background:var(--stamp);color:var(--paper-2);font:12px "Special Elite","Courier New",monospace;letter-spacing:.16em;text-transform:uppercase;padding:8px 16px 8px 22px}
+.today-file{padding:clamp(28px,4vw,56px)}
+.file-head{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;color:var(--ink-2);letter-spacing:.12em;text-transform:uppercase}
+.stamp-ink{font:13px "Special Elite","Courier New",monospace;color:var(--stamp);border:2px solid var(--stamp);padding:3px 9px;transform:rotate(-3deg);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.today-file h3{font-size:clamp(34px,3.6vw,52px);line-height:1.02;margin:18px 0 16px}
+.tale{font-family:"IM Fell English",Georgia,serif;font-style:italic;font-size:21px;line-height:1.45;margin:0 0 24px;color:var(--ink)}
+.kunye{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;margin:0 0 28px;padding:18px 0;border-top:1px solid var(--paper-edge);border-bottom:1px solid var(--paper-edge);font-size:14px}
+.kunye dt{text-transform:uppercase;letter-spacing:.14em;font-size:11px;color:var(--ink-2);padding-top:2px}
+.kunye dd{margin:0}
+.today-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.today .btn,.file-dialog .btn{background:var(--ink);color:var(--paper-2);border-color:var(--ink)}
+.today .btn:hover,.file-dialog .btn:hover{background:var(--stamp);border-color:var(--stamp)}
+.today .btn.ghost,.file-dialog .btn.ghost{background:transparent;color:var(--ink);border-color:var(--paper-edge)}
+.small{font-size:13px;color:var(--ink-2)}
+
+/* filters + grid */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.filter{font:13px "Work Sans",system-ui,sans-serif;color:var(--chalk-dim);background:transparent;border:1px solid var(--rule);padding:8px 14px;border-radius:999px;cursor:pointer;transition:all .2s}
+.filter:hover{color:var(--chalk);border-color:var(--chalk-dim)}
+.filter.on{background:var(--chalk);color:var(--wall);border-color:var(--chalk)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:22px}
+.resident{position:relative;background:var(--paper);color:var(--ink);border-radius:3px;display:flex;flex-direction:column;transition:transform .3s var(--ease),box-shadow .3s;box-shadow:0 18px 36px -26px rgba(29,42,44,.5)}
+.resident:hover{transform:translateY(-4px) rotate(-.4deg)}
+.resident:nth-child(3n+2):hover{transform:translateY(-4px) rotate(.5deg)}
+.resident-hit{position:absolute;inset:0;z-index:3;background:transparent;border:0;cursor:pointer}
+.resident-photo{position:relative;aspect-ratio:3/3.6;margin:12px 12px 0;background:var(--paper-2);border:1px solid var(--paper-edge);overflow:hidden;display:flex;align-items:flex-end;justify-content:center}
+.resident-photo img{width:100%;height:100%;object-fit:contain;padding:8% 8% 0;filter:sepia(.12)}
+.resident-body{padding:14px 16px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.resident-top{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-2);letter-spacing:.14em;text-transform:uppercase}
+.resident h3{font-size:24px;line-height:1.1}
+.resident-line{font-family:"IM Fell English",Georgia,serif;font-style:italic;font-size:16px;line-height:1.35;color:#3B4A4A;margin:0 0 6px;flex:1}
+.resident-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-top:10px;border-top:1px dashed var(--paper-edge)}
+.chip{font:11px "Special Elite","Courier New",monospace;letter-spacing:.1em;text-transform:uppercase;padding:3px 7px;border:1.5px solid currentColor;color:var(--ink-2)}
+.chip.new{color:var(--stamp)}
+.chip.longest{color:var(--brass)}
+.chip.adopted{color:var(--ink)}
+.fee{font-size:13px;font-weight:500}
+.resident.is-adopted .resident-photo img{opacity:.45;filter:grayscale(1)}
+.adopted-stamp{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) rotate(-12deg);font:22px "Special Elite","Courier New",monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--stamp);border:3px double var(--stamp);padding:6px 14px;background:rgba(247,248,244,.7)}
+.adopted-stamp.big{font-size:32px}
+.empty{color:var(--chalk-dim)}
+
+/* steps */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--rule)}
+.steps li{padding:28px 28px 8px 0;border-right:1px solid var(--rule);margin-right:28px}
+.steps li:last-child{border-right:0;margin-right:0}
+.step-no{font-size:13px;color:var(--brass);letter-spacing:.2em}
+.steps h3{font-size:32px;margin:10px 0 10px}
+.steps p{color:var(--chalk-dim);margin:0;max-width:340px}
+
+/* rules + certificate */
+.rules{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:clamp(32px,5vw,80px);align-items:center;padding-bottom:clamp(64px,8vw,120px)}
+.rules h2{font-size:clamp(40px,5vw,72px);line-height:1;margin-bottom:28px}
+.rule-list{list-style:none;padding:0;margin:0}
+.rule-list li{display:grid;grid-template-columns:44px 1fr;padding:14px 0;border-top:1px solid var(--rule);color:var(--chalk-dim);font-size:16px}
+.rule-list .tw{color:var(--brass)}
+.cert{background:var(--paper-2);color:var(--ink);padding:36px 36px 30px;border:1px solid var(--paper-edge);outline:6px double var(--paper-edge);outline-offset:-16px;text-align:center;transform:rotate(1.5deg);box-shadow:0 30px 60px -34px rgba(29,42,44,.45)}
+.cert-seal{width:76%;margin:0 auto 6px}
+.cert-k{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:6px 0 10px}
+.cert-line{font-family:"IM Fell English",Georgia,serif;font-size:24px;line-height:1.35;margin:0 0 26px}
+.cert-sign{display:flex;justify-content:space-around;gap:24px;font:11px "Special Elite","Courier New",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.cert-sign span{flex:1;border-top:1px solid var(--ink-2);padding-top:6px;max-width:140px}
+
+.foot{border-top:1px solid var(--rule);padding:48px var(--gutter) 56px;text-align:center}
+.foot-logo{width:min(360px,80%);margin:0 auto 12px}
+.foot .tw{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--chalk-dim)}
+.foot-small{font-size:12px;color:var(--ink-2);margin:6px 0 0}
+
+/* intake file dialog */
+.file-dialog{border:0;padding:0;background:var(--paper);color:var(--ink);width:min(1040px,94vw);max-height:92dvh;border-radius:3px;box-shadow:0 40px 90px rgba(29,42,44,.35)}
+.file-dialog::backdrop{background:rgba(29,42,44,.55);backdrop-filter:blur(3px)}
+.file-dialog[open]{animation:fileIn .35s var(--ease)}
+@keyframes fileIn{from{opacity:0;transform:translateY(16px) rotate(-.6deg)}}
+.close{position:absolute;top:10px;right:14px;z-index:2;background:none;border:0;font-size:32px;line-height:1;cursor:pointer;color:var(--ink)}
+.file-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+.file-photo{position:relative;background:var(--paper-2);border-right:1px dashed var(--paper-edge);display:flex;align-items:flex-end;justify-content:center;min-height:420px}
+.file-photo img{max-height:80dvh;object-fit:contain;padding:40px 24px 0;filter:sepia(.1)}
+.file-body{padding:36px clamp(22px,3vw,44px) 30px;overflow:auto;max-height:92dvh}
+.file-body h2{font-size:clamp(32px,3.4vw,48px);line-height:1.02;margin:16px 0 18px}
+.tale-parts{list-style:none;padding:0;margin:0 0 22px;font-family:"IM Fell English",Georgia,serif;font-size:19px;line-height:1.4}
+.tale-parts li{padding:8px 0}
+.tale-parts .tw{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--stamp);margin-bottom:2px}
+.found{font-family:"IM Fell English",Georgia,serif;font-style:italic;font-size:22px;color:var(--stamp)}
+.fine{font-size:12px;color:var(--ink-2);margin:22px 0 0}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--paper);color:var(--ink);padding:12px 18px;border-radius:2px;font-size:14px;box-shadow:0 12px 30px rgba(29,42,44,.25);transition:all .3s var(--ease);max-width:calc(100vw - 32px);z-index:50}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* entrance */
+@media (prefers-reduced-motion:no-preference){
+  .hero-copy>*{animation:rise .7s var(--ease) both}
+  .hero-copy>*:nth-child(2){animation-delay:.06s}.hero-copy>*:nth-child(3){animation-delay:.12s}.hero-copy>*:nth-child(4){animation-delay:.18s}.hero-copy>*:nth-child(5){animation-delay:.24s}
+  .stage .intake{animation:drop .8s var(--ease) both}
+  .stage .intake.p1{animation-delay:.1s}.stage .intake.p2{animation-delay:.2s}
+}
+@keyframes rise{from{opacity:0;translate:0 14px}}
+@keyframes drop{from{opacity:0;translate:0 -30px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* responsive */
+@media (max-width:960px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .stage{margin:10px auto 0;max-width:520px;width:100%}
+  .today,.file-grid,.rules{grid-template-columns:1fr}
+  .today-photo,.file-photo{border-right:0;border-bottom:1px dashed var(--paper-edge);min-height:360px}
+  .today-photo img{max-height:420px}
+  .file-photo img{max-height:46dvh}
+  .file-body{max-height:none}
+  .file-dialog{overflow:auto}
+  .steps{grid-template-columns:1fr}
+  .steps li{border-right:0;margin-right:0;border-bottom:1px solid var(--rule);padding-right:0}
+  .nav{display:none}
+  .top .small-btn{margin-left:auto}
+}
+@media (max-width:620px){
+  .ledger{grid-template-columns:repeat(2,1fr)}
+  .ledger div:nth-child(3){border-left:0;padding-left:0}
+  .ledger div{padding:16px 0 16px 16px}
+  .ledger strong{font-size:28px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .resident h3{font-size:19px}
+  .resident-line{display:none}
+  .resident-foot{flex-direction:column;align-items:flex-start}
+  .kunye{grid-template-columns:1fr;gap:2px}
+  .kunye dd{margin-bottom:8px}
+  .intake-stamp{font-size:10px;top:16px;right:8px}
+  .intake-label{padding:8px 10px 10px}
+  .intake-label .tw{font-size:9px}
+  .intake-photo{margin:30px 8px 0}
+  .brand span{font-size:22px}
+  .cert{padding:28px 22px 24px}
+}
+
+/* ---------- intake photo: every resident pulled from the same corridor of hangers ---------- */
+.shot{position:absolute;inset:0;display:block;overflow:hidden;container-type:size;
+  background:#1b2326 var(--corridor,none) center 42%/cover no-repeat}
+.shot::before{content:"";position:absolute;left:50%;bottom:3%;width:62%;height:7%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);pointer-events:none}
+.shot::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(90% 70% at 50% 55%,transparent 55%,rgba(0,0,0,.35))}
+.piece{position:absolute;left:50%;bottom:6%;height:84%;aspect-ratio:1086/1448;transform:translateX(-50%);z-index:1}
+.piece img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%;padding:0;max-height:none;
+  filter:drop-shadow(0 2cqw 3cqw rgba(0,0,0,.55)) drop-shadow(0 0 1.5cqw rgba(220,240,235,.10))}
+.piece-hanger{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.piece-hanger path{fill:none;stroke:#59615f;stroke-width:10;stroke-linecap:round;stroke-linejoin:round}
+.empty-hanger{position:absolute;left:50%;top:22%;width:46%;transform:translateX(-50%);z-index:1;opacity:.85}
+.empty-hanger svg{filter:drop-shadow(0 1cqw 2cqw rgba(0,0,0,.6))}
+.tag{position:absolute;right:6%;bottom:8%;z-index:2;display:flex;flex-direction:column;align-items:center;min-width:22cqw;padding:5cqw 2.6cqw 2.4cqw;
+  background:#F2F5F0;color:var(--ink);font-family:"Special Elite","Courier New",monospace;line-height:1;transform:rotate(6deg);transform-origin:50% 0;
+  clip-path:polygon(22% 0,78% 0,100% 13%,100% 100%,0 100%,0 13%);box-shadow:0 1cqw 2cqw rgba(0,0,0,.4)}
+.tag-hole{position:absolute;top:1.6cqw;left:50%;width:2.6cqw;height:2.6cqw;margin-left:-1.3cqw;border-radius:50%;background:#1b2326;box-shadow:0 0 0 .6cqw var(--brass)}
+.tag-no{font-size:3.6cqw;letter-spacing:.08em;opacity:.7}
+.tag-nick{font-family:"IM Fell English",Georgia,serif;font-style:italic;font-size:6cqw;margin-top:1cqw}
+.tag-day{font-family:"IM Fell English",Georgia,serif;font-size:12cqw;line-height:.95;margin-top:.6cqw;color:var(--stamp)}
+.tag-txt{font-size:3.2cqw;letter-spacing:.1em;text-transform:uppercase;opacity:.75}
+.nick{font-family:"IM Fell English",Georgia,serif;font-style:italic;font-size:22px;color:var(--stamp);margin:16px 0 -10px}
+.nick span{font-size:16px;color:var(--ink-2)}
+.chip.arriving{color:var(--ink-2);border-style:dashed}
+.resident.is-arriving{opacity:.82}
+.resident.is-arriving:hover{transform:none}
+
+/* containers now hold the shot */
+.intake-photo{position:relative;padding:0}
+.resident-photo,.today-photo,.file-photo{padding:0}
+.today-photo{min-height:0;aspect-ratio:4/5;align-self:stretch}
+.file-photo{min-height:560px;align-self:stretch}
+.today-photo img,.file-photo img{max-height:none;padding:0}
+.resident-photo{aspect-ratio:4/5}
+.resident.is-adopted .shot img{opacity:.45;filter:grayscale(1)}
+.adopted-stamp{z-index:3}
+.today-ribbon{z-index:3}
+@media (max-width:960px){.today-photo,.file-photo{aspect-ratio:4/4.4;min-height:0}}
+
+.hero{overflow-x:clip}
+html{overflow-x:clip}
