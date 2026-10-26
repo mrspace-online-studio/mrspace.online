@@ -6,15 +6,15 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Next Keeper · Home for Wayward Garments</title>
   <meta name="description" content="Next Keeper is a shelter for clothes with a past. Meet the residents and adopt the one that should come home with you.">
-  <meta name="theme-color" content="#EEF2EF">
+  <meta name="theme-color" content="#F3F2ED">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%2240 20 320 190%22%3E%3Cpath d=%22M200 104V90c0-10 16-16 16-34 0-18-13-28-26-28-14 0-22 10-22 22M200 110c-24 14-90 46-136 66-14 6-14 18 2 18h268c16 0 16-12 2-18-46-20-112-52-136-66%22 fill=%22none%22 stroke=%22%2313201F%22 stroke-width=%2214%22 stroke-linecap=%22round%22/%3E%3C/svg%3E">
   <link rel="canonical" href="https://mrspace.online/nextkeeper/">
-  <link rel="stylesheet" href="/nextkeeper/nk.css?v=20261026-v4">
-  <script src="/nextkeeper/nk.js?v=20261026-v4" defer></script>
+  <link rel="stylesheet" href="/nextkeeper/nk.css?v=20261026-editorial-final">
+  <script src="/nextkeeper/nk.js?v=20261026-editorial-final" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<div id="ticker" class="ticker" aria-label="Shelter news"></div>
+<div class="notice">Preview · sample residents · the shelter opens soon</div>
 
 <header class="top">
   <a class="brand" href="./" aria-label="Next Keeper home">
@@ -23,84 +23,89 @@
   </a>
   <nav class="nav" aria-label="Main">
     <a href="#shelter">Residents</a>
-    <a href="#coming-sec">Arriving</a>
-    <a href="#adoption">How it works</a>
+    <a href="#today-sec">Today's resident</a>
+    <a href="#adoption">How adoption works</a>
   </nav>
   <button class="bag-btn" type="button" data-bag-open aria-label="Open your keeper's bag">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z M9 8V6a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-    <span>Bag</span><b data-bag-count>0</b>
+    <span>Bag</span><b id="bagCount" data-bag-count>0</b>
   </button>
 </header>
 
 <main id="main">
   <section class="hero" data-ms-section="opening">
     <div class="hero-copy">
-      <p class="kicker"><span class="dot" aria-hidden="true"></span>Home for wayward garments · Venice Beach</p>
+      <p class="kicker">Home for Wayward Garments · Venice Beach</p>
       <h1 data-ms-field="opening.title">Every piece here is waiting for its <em>next keeper.</em></h1>
       <p class="lede" data-ms-field="opening.description">One-of-a-kind clothes with a past. We mend them, write down their story and find each one a home. When one is adopted, it is gone.</p>
       <div class="hero-actions">
         <a class="btn" href="#shelter">Meet the residents <span aria-hidden="true">→</span></a>
-        <a class="btn ghost" href="#adoption">How adoption works</a>
+        <a class="btn ghost" href="#today-sec">Today's resident</a>
       </div>
-      <ul class="promises">
-        <li>One of a kind</li><li>Mended by hand</li><li>Numbered certificate</li>
+      <ul class="stats" aria-label="Shelter at a glance">
+        <li><b id="st-wait">6</b><span>residents now</span></li>
+        <li><b id="st-queue">3</b><span>on the way</span></li>
+        <li><b id="st-homed">1</b><span>found a home</span></li>
       </ul>
     </div>
-    <div id="spot" class="spot" aria-live="polite"></div>
+    <div class="stage-wrap">
+      <div id="stage" class="stage" aria-label="Residents waiting today"></div>
+      <div class="stage-tools"><span class="mono">From the shelter archive</span><span class="mono">Venice Beach, CA</span></div>
+    </div>
   </section>
 
   <section id="shelter" data-ms-section="shelter" class="section">
     <div class="sec-head">
       <div>
         <p class="kicker">The residents</p>
-        <h2>Find the one that should <em>come home with you.</em></h2>
+        <h2>Find the one that should come home with you.</h2>
       </div>
-      <div class="tools">
-        <span id="resultCount" class="mono" role="status" aria-live="polite"></span>
-        <label class="sort"><span class="sr">Sort</span>
-          <select id="sort">
-            <option value="newest">Newest arrivals</option>
-            <option value="longest">Longest residents</option>
-            <option value="low">Fee: low to high</option>
-            <option value="high">Fee: high to low</option>
-          </select>
-        </label>
-      </div>
+      <label class="sort">Sort
+        <select id="sort">
+          <option value="newest">Newest arrivals</option>
+          <option value="longest">Longest residents</option>
+          <option value="low">Fee: low to high</option>
+          <option value="high">Fee: high to low</option>
+        </select>
+      </label>
     </div>
     <div id="filters" class="filters" role="toolbar" aria-label="Filter residents"></div>
+    <p id="resultCount" class="result-count" role="status" aria-live="polite"></p>
     <div id="grid" class="grid"></div>
   </section>
 
-  <section class="brand-note reveal" data-ms-section="philosophy">
-    <h2 data-ms-field="philosophy.title">Every story is true. <em>Some more than others.</em></h2>
+  <section class="brand-note" data-ms-section="philosophy">
+    <p class="kicker">A second life, well lived.</p>
+    <h2 data-ms-field="philosophy.title">Every story is true.<br><em>Some more than others.</em></h2>
     <p>We don't sell clothes. We sell what they've been through. Probably.</p>
   </section>
 
-  <section id="coming-sec" data-ms-section="coming-sec" class="section">
+  <section id="coming-sec" data-ms-section="coming-sec" class="section coming-wrap">
     <div class="sec-head">
       <div>
         <p class="kicker">Coming and going</p>
-        <h2>Some are arriving. <em>Some found a home.</em></h2>
+        <h2>Some are arriving. Some have found a home.</h2>
       </div>
     </div>
     <div id="coming" class="coming"></div>
   </section>
 
   <section id="today-sec" data-ms-section="today-sec" class="section">
-    <div id="today" class="today reveal"></div>
+    <div id="today" class="today"></div>
   </section>
 
   <section id="adoption" data-ms-section="adoption" class="section adoption">
     <div class="adopt-copy">
       <p class="kicker">How adoption works</p>
-      <h2>Three steps. One piece. <em>A new chapter.</em></h2>
+      <h2>Three steps. One piece. A new chapter.</h2>
       <ol class="steps">
-        <li class="reveal"><b>01</b><strong>Read the file.</strong><span>Size, cloth and condition are checked by hand. The story is how we remember it.</span></li>
-        <li class="reveal"><b>02</b><strong>Adopt.</strong><span>Pay the adoption fee and it comes off the hanger for good.</span></li>
-        <li class="reveal"><b>03</b><strong>Take it home.</strong><span>It ships with a numbered certificate. Scan the tag and its story follows.</span></li>
+        <li><b>01</b><span><strong>Read the file.</strong> Size, cloth and condition are checked by hand. The story is how we remember it.</span></li>
+        <li><b>02</b><span><strong>Adopt.</strong> Pay the adoption fee and it comes off the hanger for good.</span></li>
+        <li><b>03</b><span><strong>Take it home.</strong> It ships with a numbered certificate. Scan the tag and its story follows.</span></li>
       </ol>
+      <p class="fine-print">Every story is true. Some more than others.</p>
     </div>
-    <figure class="cert reveal" aria-label="Sample adoption certificate">
+    <figure class="cert" aria-label="Sample adoption certificate">
       <div class="cert-seal" data-logo></div>
       <figcaption>
         <span class="mono">Certificate of adoption · No. 005</span>
@@ -115,12 +120,10 @@
     <a class="brand" href="./"><span class="brand-icon" data-hanger></span><span class="brand-name">Next Keeper</span></a>
     <p>Next Keeper by Heron CA · Venice Beach, California</p>
   </div>
-  <p class="foot-small">Preview build. Residents, fees and stories on this page are samples. Nothing is reserved or charged.</p>
+  <p class="foot-small">Preview build. Residents, fees and stories on this page are samples.</p>
 </footer>
 
-<div id="dock" class="dock" hidden>
-  <button type="button" data-bag-open><span><b data-bag-count>0</b> in your bag</span><span id="dockTotal">$0</span><span aria-hidden="true">→</span></button>
-</div>
+<div id="dock" class="dock" hidden><button type="button" data-bag-open><span><b data-bag-count>0</b> in your bag</span><span id="dockTotal">$0</span><span aria-hidden="true">→</span></button></div>
 
 <dialog id="bag" class="bag" aria-labelledby="bagTitle">
   <div class="bag-head"><h2 id="bagTitle">Your keeper's bag</h2><button type="button" class="icon-btn" data-bag-close aria-label="Close bag">×</button></div>
@@ -132,6 +135,7 @@
     <p id="bagNotice" class="dialog-notice" role="status" aria-live="polite"></p>
   </div>
 </dialog>
+
 
 <dialog id="fileDialog" class="file-dialog" aria-label="Intake file"><div id="file"></div></dialog>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
