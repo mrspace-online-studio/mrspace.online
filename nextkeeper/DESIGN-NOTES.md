@@ -31,3 +31,9 @@ Kullanıcının Claude sürümünü tercih etmesi üzerine, onun yerel `homepage
 Otomatik vitrin hareketi duraklatılabilir; reduced-motion tercihinde durur, klavye odağı vitrin içindeyken ve dialog açıkken ilerlemez. Üç veya daha az parça varsa sonsuz seçim döngüsüne girmez. Günlük geliş vaadi ve kesin geliş günü iddiaları yerine kayıt hazırlığı gösterilir. Sayılar gerçek örnek diziden hesaplanır.
 
 Doğrulama: 320/390/768/1024/1440 px sayfa genişliği taşmıyor; küçük ekran filtreleri kendi satırında yatay kayıyor. Fiyat sırası 220/280/300/340/360/380. Shirts boş sonuç, Dresses iki parça gösterir. Dosyadan çantaya geçiş, tekrar ekleme, kaldırma, toplam ve önizleme mesajı gerçek tarayıcıda kontrol edildi.
+
+## Son editoryal düzen
+
+Claude'un Instrument Serif / Geist tipografisi korunarak büyük marka başlığı, sabit iki fotoğraflı vitrin, çerçevesiz üç sütun katalog ve taş / adaçayı / koyu mürekkep paletine geçildi. Otomatik kart döngüsü kaldırıldı. Kapsül düğmeler, iç içe kartlar ve gölgeler azaltıldı. İçerik, düzenleyici kimlikleri ve çanta davranışı korunur.
+
+Gerçek tarayıcıda masaüstü ve 390 px görünüm incelendi; 320 ve 1440 px sayfa genişliğinde taşma yok. Vitrinden Lavandula dosyası açıldı, çantaya ekleme bildirimi doğrulandı, hata günlüğü temiz. JavaScript sözdizimi ve diff kontrolü başarılı. Önizleme ve ödeme kapsamı değişmedi.

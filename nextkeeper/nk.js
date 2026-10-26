@@ -127,7 +127,6 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   };
-  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   /* the intake photo: every resident in the same corridor of hangers */
   function shot(r) {
     var piece = r.img
@@ -285,46 +284,25 @@
     });
   }
 
-  /* ---------- hero: three residents that keep changing places ---------- */
+  /* ---------- a still-life from the shelter archive ---------- */
   function heroCard(r, pos) {
-    return '<button class="intake p' + pos + '" data-no="' + r.no + '" aria-label="Meet ' + esc(r.nick) + ', ' + esc(r.name) + '">' +
+    return '<button type="button" class="intake p' + pos + '" data-no="' + r.no + '" aria-label="Meet ' + esc(r.nick) + ', ' + esc(r.name) + '">' +
       '<span class="intake-photo">' + shot(r).replace('loading="lazy"', 'loading="eager"') + '</span>' +
-      '<span class="intake-label"><span class="intake-name">' + esc(r.nick) + '</span><span class="mono">' + money(r.fee) + '</span></span>' +
+      '<span class="intake-label"><span class="intake-name">' + esc(r.nick) + '</span><span class="mono">No. ' + r.no + ' / ' + money(r.fee) + '</span></span>' +
       '</button>';
   }
   function initHero() {
     var stage = $("#stage");
-    if (!stage || available.length < 3) return;
-    var order = [0, 1, 2];
-    var front = available.slice().sort(function (a, b) { return a.day - b.day; });
-    var pool = front.map(function (_, i) { return i; });
-    stage.innerHTML = order.map(function (idx, pos) { return heroCard(front[idx], pos); }).join("");
-    stage.addEventListener("click", function (e) { var b = e.target.closest(".intake"); if (b) openPiece(b.getAttribute("data-no")); });
-    var paused = false, next = 3, manualPause = reduced;
-    var toggle = $("#motionToggle");
-    function motionState() { toggle.textContent = manualPause ? "Play rotation" : "Pause rotation"; toggle.setAttribute("aria-pressed", String(manualPause)); }
-    motionState();
-    toggle.addEventListener("click", function () { manualPause = !manualPause; motionState(); });
-    stage.addEventListener("mouseenter", function () { paused = true; });
-    stage.addEventListener("mouseleave", function () { paused = false; });
-    setInterval(function () {
-      if (paused || manualPause || document.hidden || front.length <= 3 || stage.contains(document.activeElement) || dlg.open || $("#bag").open) return;
-      var cards = stage.querySelectorAll(".intake");
-      var leaving = stage.querySelector(".p0"), f = stage.querySelector(".p1"), right = stage.querySelector(".p2");
-      leaving.classList.add("leaving");
-      f.classList.remove("p1"); f.classList.add("p0");
-      right.classList.remove("p2"); right.classList.add("p1");
-      var shown = Array.prototype.map.call(cards, function (c) { return c.getAttribute("data-no"); });
-      var cand;
-      do { cand = front[pool[next++ % pool.length]]; } while (shown.indexOf(cand.no) > -1);
-      var tmp = document.createElement("div");
-      tmp.innerHTML = heroCard(cand, 2);
-      var incoming = tmp.firstChild;
-      incoming.classList.add("arriving");
-      stage.appendChild(incoming);
-      requestAnimationFrame(function () { requestAnimationFrame(function () { incoming.classList.remove("arriving"); }); });
-      setTimeout(function () { leaving.remove(); }, 800);
-    }, 3800);
+    if (!stage) return;
+    var selection = ["002", "003"].map(function (no) {
+      return available.find(function (r) { return r.no === no; });
+    }).filter(Boolean);
+    if (!selection.length) selection = available.slice(0, 2);
+    stage.innerHTML = selection.map(heroCard).join("");
+    stage.addEventListener("click", function (e) {
+      var b = e.target.closest(".intake");
+      if (b) openPiece(b.getAttribute("data-no"));
+    });
   }
 
   /* ---------- the residents (shop grid) ---------- */
