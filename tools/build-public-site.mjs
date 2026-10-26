@@ -4,7 +4,7 @@ import {mkdir, readFile, writeFile, lstat} from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-const roots = new Set(['admin','assets','build','edit','first-clients','handover','iwona-ash','library','linenshirt','mrspace','packages','panel','preview','request','rufcut','service-unavailable','space-tailoring','site','square-sku-guide','squarebaglantisi','start','studio-direction','studio','prova','try']);
+const roots = new Set(['nextkeeper''admin','assets','build','edit','first-clients','handover','iwona-ash','library','linenshirt','mrspace','packages','panel','preview','request','rufcut','service-unavailable','space-tailoring','site','square-sku-guide','squarebaglantisi','start','studio-direction','studio','prova','try']);
 const rootFiles = new Set(['index.html','404.html','CNAME','robots.txt','sitemap.xml','og.png']);
 const extensions = new Set(['.html','.css','.js','.json','.webmanifest','.png','.jpg','.jpeg','.webp','.avif','.gif','.svg','.ico','.woff','.woff2','.ttf','.otf','.mp4','.webm','.mp3','.wav','.pdf']);
 export function isPublicFile(file) {
